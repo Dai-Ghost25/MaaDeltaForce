@@ -1,0 +1,56 @@
+{
+    "识别设置1":{
+        "recognition":"OCR",
+        "expected": "设置",
+        "roi":[1106, 40, 34, 18],
+        "action":"Click",
+        "next":[
+            "切换[全面战场]"
+        ]
+    },
+    "切换[全面战场]":{
+        "recognition":"OCR",
+        "expected": "全面战场",
+        "roi":[770, 480, 103, 30],
+        "action":"Click",
+        "next":[
+            "确认切换[全面战场]"
+        ]
+    },
+    "确认切换[全面战场]":{
+        "recognition":"And",
+        "all_of":[
+            {
+                "recognition":"OCR",
+                "expected": "确认",
+                "roi":[694,466,46,27]
+            },
+            {
+                "recognition":"OCR",
+                "expected": "全面战场",
+                "roi":[456,291,240,20]
+                
+            }
+        ],
+        "box_index":0,
+        "action":"Click",
+        "next":[
+            "关闭全面战场广告",
+            "识别军械库为主页"
+        ]
+    },
+    "关闭全面战场广告":{
+        "recognition":"TemplateMatch",
+        "template":"广告关闭按钮.jpg",
+        "roi":[1047, 10, 65, 64],
+        "action":"Click",
+        "next":[
+            "识别军械库为主页"
+        ]
+    },
+    "识别军械库为主页":{
+        "recognition":"OCR",
+        "expected": "军械库",
+        "roi":[372, 656, 66, 28]
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "识别设置2":{
+        "recognition":"OCR",
+        "expected": "设置",
+        "roi":[1106, 40, 34, 18],
+        "action":"Click",
+        "next":[
+            "切换[烽火地带]"
+        ]
+    },
+    "切换[烽火地带]":{
+        "recognition":"OCR",
+        "expected": "烽火地带",
+        "roi":[331, 479, 104, 30],
+        "action":"Click",
+        "next":[
+            "确认切换[烽火地带]"
+        ]
+    },
+    "确认切换[烽火地带]":{
+        "recognition":"And",
+        "all_of":[
+            {
+                "recognition":"OCR",
+                "expected": "确认",
+                "roi":[694,466,46,27]
+            },
+            {
+                "recognition":"OCR",
+                "expected": "烽火地带",
+                "roi":[456,291,240,20]
+                
+            }
+        ],
+        "box_index":0,
+        "action":"Click",
+        "next":[
+            "关闭广告",
+            "识别改枪台为主页"
+        ]
+    }
+}

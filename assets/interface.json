@@ -1,0 +1,36 @@
+{
+
+    "interface_version": 2,
+    "name": "MaaXXX",
+    "description": "这是一个使用 MaaFramework 创建的新项目。",
+    "contact": "QQ群: 123456789",
+    "license": "MIT",
+    "welcome": "首次使用！欢迎使用 MAA!",
+
+    "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
+    "version": "1.0.0",
+
+    "controller": [
+        {
+            "name": "安卓端",
+            "type": "Adb",
+            "display_short_side": 720
+        }
+    ],
+    "resource": [
+        {
+            "name": "官服",
+            "path": [
+                "./resource"
+            ]
+        }
+    ],
+
+    "task": [
+        {
+            "name": "my_task",
+            "entry": "冷静期"
+        }
+    ]
+
+}

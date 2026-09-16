@@ -1,0 +1,91 @@
+{
+    "StartApp":{
+        "action":"StartApp",
+        "package":"com.tencent.tmgp.dfm",
+        "post_delay": 20000,
+        "next":[
+            "QQ登录",
+            "进入烽火地带"
+        ]
+    },
+    "QQ登录":{
+        "recognition":"OCR",
+        "expected": "QQ登录",
+        "roi":[668, 568, 72, 25],
+        "action":"Click",
+        "next":[
+            "切换账号",
+            "进入烽火地带"
+        ]
+    },
+    "切换账号":{
+        "recognition":"OCR",
+        "expected": "切换账号",
+        "roi":[547, 622, 55, 18],
+        "action":"Click",
+        "next":[
+            "选择QQ：123456789"
+        ]
+    },
+    "选择QQ：32165489":{
+        "recognition":"OCR",
+        "expected": "32165489",
+        "roi":[75, 507, 80, 186],
+        "action":"Click",
+        "next":[
+            "QQ点击同意"
+        ]
+    },
+    "选择QQ：123456799":{
+        "recognition":"OCR",
+        "expected": "123456987",
+        "roi":[75, 507, 80, 186],
+        "action":"Click",
+        "next":[
+            "QQ点击同意"
+        ]
+    },
+    "QQ点击同意":{
+        "recognition":"OCR",
+        "expected": "同意",
+        "roi":[555, 534, 39, 62],
+        "action":"Click",
+        "next":[
+            "QQ再次同意"
+        ]
+    },
+    "QQ再次同意":{
+        "recognition":"OCR",
+        "expected": "同意",
+        "roi":[555, 534, 39, 62],
+        "action":"Click",
+        "post_delay": 5000,
+        "next":[
+            "进入烽火地带"
+        ]
+    },
+    "进入烽火地带":{
+        "recognition":"OCR",
+        "expected": "烽火地带",
+        "roi":[25,575,400,75],
+        "action":"Click",
+        "next":[
+            "关闭广告",
+            "识别改枪台为主页"
+        ]
+    },
+    "关闭广告":{
+        "recognition":"TemplateMatch",
+        "template":"广告关闭按钮.jpg",
+        "roi":[1047, 10, 65, 64],
+        "action":"Click",
+        "next":[
+            "识别改枪台为主页"
+        ]
+    },
+    "识别改枪台为主页":{
+        "recognition":"OCR",
+        "expected": "改枪台",
+        "roi":[596, 658, 65, 26]
+    }
+}

@@ -1,0 +1,110 @@
+{
+    "点击邮件":{
+        "recognition":"OCR",
+        "expected": "邮件",
+        "roi":[1051, 40, 35, 19],
+        "action":"Click",
+        "next":[
+            "点击系统邮件"
+        ]
+    },
+    "点击系统邮件":{
+        "recognition":"OCR",
+        "expected": "系统",
+        "roi":[34, 99, 38, 24],
+        "action":"Click",
+        "next":[
+            "滑动邮件"
+        ]
+    },
+    "滑动邮件":{
+        "action":"Swipe",
+        "begin":[300,520,20,20],
+        "end":[300,200,20,20],
+        "duration":100,
+        "next":[
+            "倒数第1邮件",
+            "倒数第2邮件",
+            "倒数第3邮件",
+            "倒数第4邮件",
+            "倒数第5邮件",
+            "倒数第6邮件",
+            "倒数第7邮件"
+        ]
+    },
+    "过期时间":{
+        "recognition":"OCR",
+        "expected": "后过期",
+        "roi":[1056, 111, 84, 21],
+        "next":[
+            "返回主页"
+        ]
+    },
+    "返回主页":{
+        "action": "Click",
+       "target": [13, 13, 29, 32]
+    },
+    "倒数第1邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,540,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第2邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,480,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第3邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,420,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第4邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,360,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第5邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,290,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第6邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,225,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    },
+    "倒数第7邮件":{
+        "recognition":"OCR",
+        "expected": "物资异常丢失补偿",
+        "roi":[120,160,160,50],
+        "action":"Click",
+        "next":[
+            "过期时间"
+        ]
+    }
+}

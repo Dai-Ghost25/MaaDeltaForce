@@ -1,0 +1,50 @@
+schedules:
+  - name: 每晚检查邮件
+    enabled: true
+    trigger:
+      type: cron
+      expr: "0 1 * * *"          # 每天 19点启动
+    tasks:
+      - 启动游戏
+      - 邮件检查
+      - 关闭游戏
+      
+
+  - name: 8小时自动收菜
+    enabled: true
+    trigger:
+      type: interval
+      seconds: 29100                # 8小时+5分钟
+    tasks:
+      - 启动游戏
+      - 一键收菜
+      - 关闭游戏
+
+  - name: test
+    enabled: false
+    trigger:
+      type: interval
+      seconds: 300                # 5分钟
+    tasks:
+      - 启动游戏
+      - 邮件检查
+      - 关闭游戏
+
+  - name: 每晚自动大战场
+    enabled: true
+    trigger:
+      type: cron
+      expr: "06 2 * * *"          # 每天 2点启动
+    tasks:
+      - 启动游戏
+      - 切换到全面战场
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 蜂医挂机
+      - 关闭游戏

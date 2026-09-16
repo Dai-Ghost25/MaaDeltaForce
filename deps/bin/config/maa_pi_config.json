@@ -1,0 +1,47 @@
+{
+    "adb": {
+        "adb_path": "D:/Dai/应用程序/AppLirbray/安卓有线投屏/scrcpy-win64-v3.3.1/adb.exe",
+        "address": "192.168.1.169:5555",
+        "name": "192.168.1.169:5555-D:/Dai/应用程序/AppLirbray/安卓有线投屏/scrcpy-win64-v3.3.1/adb.exe"
+    },
+    "controller": {
+        "name": "安卓端"
+    },
+    "controller_option": [
+    ],
+    "gamepad": {
+        "_placeholder": 0,
+        "gamepad_type": ""
+    },
+    "global_option": [
+    ],
+    "lnx": {
+        "eis_socket_path": "",
+        "uinput_screen_height": 0,
+        "uinput_screen_width": 0,
+        "wlr_socket_path": ""
+    },
+    "macos": {
+        "input": "",
+        "screencap": "",
+        "title": "",
+        "window_id": 0
+    },
+    "playcover": {
+        "address": "",
+        "uuid": ""
+    },
+    "resource": "官服",
+    "resource_option": [
+    ],
+    "task": [
+        {
+            "name": "邮件检查",
+            "option": [
+            ]
+        }
+    ],
+    "win32": {
+        "_placeholder": 0
+    }
+}

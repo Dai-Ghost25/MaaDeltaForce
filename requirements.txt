@@ -1,0 +1,4 @@
+maafw
+apscheduler
+pyyaml
+requests

@@ -1,0 +1,311 @@
+{
+    "三角洲自动收菜，启动！":{
+        "next":[
+            "进入特勤处"
+        ]
+    },
+    
+    "进入特勤处":{
+        "recognition":"OCR",
+        "expected": "特勤处",
+        "roi":[486, 658, 63, 26],
+        "action":"Click",
+        "post_delay":500,
+        "next":[
+            "进入技术中心"
+        ]
+    },
+    "进入技术中心":{
+        "action":"Click",
+        "target":[240,270,10,10],
+        "next":[
+            "领取技术中心",
+            "制造剩余时间",
+            "请放入生产图纸"
+        ]
+    },
+    "进入工作台":{
+        "action":"Click",
+        "target":[463, 253, 23, 25],
+        "next":[
+            "领取工作台",
+            "制造剩余时间",
+            "请放入生产图纸"
+        ]
+    },
+    "进入制药台":{
+        "action":"Click",
+        "target":[218,528,47,17],
+        "next":[
+            "领取制药台",
+            "制造剩余时间",
+            "请放入生产图纸"
+        ]
+    },
+    "进入防具台":{
+        "action":"Click",
+        "target":[463,528,10,10],
+        "next":[
+            "领取防具台",
+            "制造剩余时间",
+            "请放入生产图纸"
+        ]
+    },
+    "是否在技术中心":{
+        "recognition":"OCR",
+        "expected": "技术中心",
+        "roi":[45, 11, 111, 34],
+        "next":["技术中心返回"]
+    },
+    "是否在工作台":{
+        "recognition":"OCR",
+        "expected": "工作台",
+        "roi":[45, 11, 111, 34],
+        "next":["工作台返回"]
+    },
+    "是否在制药台":{
+        "recognition":"OCR",
+        "expected": "制药台",
+        "roi":[45, 11, 111, 34],
+        "next":["制药台返回"]
+    },
+    "是否在防具台":{
+        "recognition":"OCR",
+        "expected": "防具台",
+        "roi":[45, 11, 111, 34],
+        "next":["防具台返回"]
+    },
+    "技术中心返回": {
+       "action": "Click",
+       "target": [13, 13, 29, 32],
+       "next": [
+           "进入工作台"
+       ]
+    },
+    "工作台返回": {
+        "action": "Click",
+        "target": [13, 13, 29, 32],
+        "next": [
+            "进入制药台"
+       ]
+    },
+    "制药台返回": {
+        "action": "Click",
+       "target": [13, 13, 29, 32],
+       "next": [
+           "进入防具台"
+       ]
+    },
+    "防具台返回": {
+        "action": "Click",
+       "target": [13, 13, 29, 32],
+       "next": [
+          "全部完成"
+      ]
+    },
+    "领取技术中心":{
+        "recognition":"OCR",
+        "expected": "点击空白跳过",
+        "action":"Click",
+        "roi":[530, 678, 89, 17],
+        "next":[
+            "进入技术中心"
+        ]
+    },
+    "领取工作台":{
+        "recognition":"OCR",
+        "expected": "点击空白跳过",
+        "action":"Click",
+        "roi":[530, 678, 89, 17],
+        "next":[
+            "进入工作台"
+        ]
+    },
+    "领取制药台":{
+        "recognition":"OCR",
+        "expected": "点击空白跳过",
+        "action":"Click",
+        "roi":[530, 678, 89, 17],
+        "next":[
+            "进入制药台"
+        ]
+    },
+    "领取防具台":{
+        "recognition":"OCR",
+        "expected": "点击空白跳过",
+        "action":"Click",
+        "roi":[530, 678, 89, 17],
+        "next":[
+            "进入防具台"
+        ]
+    },
+    "中止":{
+        "recognition":"OCR",
+        "expected": "中止",
+        "roi":[979, 654, 48, 29],
+        "next":[
+            "是否在技术中心",
+            "是否在工作台",
+            "是否在制药台",
+            "是否在防具台"
+        ]
+    },
+    "制造剩余时间":{
+        "recognition":"OCR",
+        "expected": "剩余时间：",
+        "roi":[904, 593, 195, 25],
+        "next":[
+            "是否在技术中心",
+            "是否在工作台",
+            "是否在制药台",
+            "是否在防具台"
+        ]
+        
+    },
+    "请放入生产图纸":{
+        "recognition":"OCR",
+        "expected": "请放入生产图纸",
+        "roi":[724, 454, 107, 20],
+        "next":[
+            ".300 BLK",
+            "复合弓",
+            "精密护甲维修包",
+            "精英防弹背心"
+        ]
+    },
+    "一键补齐":{
+        "recognition":"OCR",
+        "expected": "一键补齐",
+        "roi":[976, 652, 69, 30],
+        "action":"Click",
+        "post_delay":1000,
+        "next":[
+            "补齐清单",
+            "制造剩余时间"
+        ]
+    },
+    "补齐清单":{
+        "recognition":"OCR",
+        "expected": "一键补齐",
+        "action":"Click",
+        "target":[552, 548, 68, 25],
+        "post_delay":1000,
+        "next":[
+            "生产"
+        ]
+    },
+    "生产":{
+        "recognition":"OCR",
+        "expected": "生产",
+        "roi":[981, 654, 43, 24],
+        "action":"Click",
+        "next":[
+            "制造剩余时间"
+        ]
+    },
+    "全部完成":{
+        "action": "Click",
+       "target": [13, 13, 29, 32]
+    },
+    "9x19mm RIP":{
+        "recognition":"OCR",
+        "expected": "9x19mm RIP",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    ".300 BLK":{
+        "recognition":"OCR",
+        "expected": ".300 BLK",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "M14射手步枪":{
+        "recognition":"OCR",
+        "expected": "14射手步枪",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "精密护甲维修包":{
+        "recognition":"OCR",
+        "expected": "精密护甲维修包",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "战地医疗箱":{
+        "recognition":"OCR",
+        "expected": "战地医疗箱",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "体能强化剂":{
+        "recognition":"OCR",
+        "expected": "体能强化剂",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "精英防弹背心":{
+        "recognition":"OCR",
+        "expected": "精英防弹背心",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "OE2战斗兴奋剂":{
+        "recognition":"OCR",
+        "expected": "OE2战斗兴奋剂",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "高级护甲维修组合":{
+        "recognition":"OCR",
+        "expected": "高级护甲维修组合",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "复合弓":{
+        "recognition":"OCR",
+        "expected": "复合弓",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    }
+
+}

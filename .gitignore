@@ -1,0 +1,33 @@
+# Git 自身
+.git/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# IDE / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.pid
+*.log
+logs/
+output/
+
+# 敏感文件
+settings.txt
+.env
+*.key
+*.pem
+id_rsa
+id_ed25519
+secrets.json
