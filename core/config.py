@@ -24,7 +24,7 @@ TASKS = {
         "description": "拉起游戏并进入主界面。",
         "entry": "StartApp",     # pipeline 里的入口节点名
         "enabled": True,
-        "notify": "none",          # simple / report / none
+        "notify": "none",          # simple / report / none 是否发送通知
     },
     "一键收菜": {
         "label": "三角洲自动收菜",
@@ -76,8 +76,8 @@ TASKS = {
         "enabled": True,
         "notify": "report",
         "watch_nodes": {
-            "识别进攻方图标":{"label":"攻防方"},
-            "识别防守方图标":{"label":"攻防方"},
+            "识别进攻方图标":{"label":"攻防方","value":"进攻方"},
+            "识别防守方图标":{"label":"攻防方","value":"防守方"},
             "读取全面战场战绩输赢":     {"label": "输赢"},
             "读取全面战场战绩得分":     {"label": "得分"},
             "读取全面战场战绩对局时间": {"label": "对局时间"},

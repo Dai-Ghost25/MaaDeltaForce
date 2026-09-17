@@ -1,16 +1,23 @@
 {
     "三角洲自动收菜，启动！":{
         "next":[
+            "收菜前识别改枪台"
+        ]
+    },
+    "收菜前识别改枪台":{
+        "recognition":"OCR",
+        "expected": "改枪台",
+        "roi":[596, 658, 65, 26],
+        "next":[
             "进入特勤处"
         ]
     },
-    
     "进入特勤处":{
         "recognition":"OCR",
         "expected": "特勤处",
         "roi":[486, 658, 63, 26],
         "action":"Click",
-        "post_delay":500,
+        "post_delay":800,
         "next":[
             "进入技术中心"
         ]

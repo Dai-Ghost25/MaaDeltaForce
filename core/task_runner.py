@@ -143,8 +143,12 @@ class TaskRunner:
         self.controller = AdbController(
             adb_path=adb,
             address=self.cfg.device_addr,
+            screencap_methods=4 | 2 | 1,
         )
         self.controller.post_connection().wait()
+
+        self.controller.set_screenshot_target_short_side(720)
+        logger.info("ADB 连接成功，截图目标尺寸已设置")
 
     def _init_resource(self):
         self.resource = Resource()
@@ -203,33 +207,33 @@ class TaskRunner:
 
     # ---- 通知 ----
 
-    def _format_captured(self) -> str:
-        if not self._captured:
-            return "（无捕获内容）"
+    # def _format_captured(self) -> str:
+    #     if not self._captured:
+    #         return "（无捕获内容）"
 
-        watch = self._current.get("watch_nodes") if self._current else None
-        lines = []
+    #     watch = self._current.get("watch_nodes") if self._current else None
+    #     lines = []
 
-        for r in self._captured:
-            node, text = r["node"], r["text"]
-            if isinstance(watch, dict) and node in watch:
-                mode = watch[node]
-            else:
-                mode = "auto"
+    #     for r in self._captured:
+    #         node, text = r["node"], r["text"]
+    #         if isinstance(watch, dict) and node in watch:
+    #             mode = watch[node]
+    #         else:
+    #             mode = "auto"
 
-            if mode == "node":
-                lines.append(f"- {node}")
-            elif mode == "text":
-                lines.append(f"- {text}")
-            elif mode == "both":
-                lines.append(f"- **{node}**: {text}")
-            else:
-                if node == text:
-                    lines.append(f"- {text}")
-                else:
-                    lines.append(f"- **{node}**: {text}")
+    #         if mode == "node":
+    #             lines.append(f"- {node}")
+    #         elif mode == "text":
+    #             lines.append(f"- {text}")
+    #         elif mode == "both":
+    #             lines.append(f"- **{node}**: {text}")
+    #         else:
+    #             if node == text:
+    #                 lines.append(f"- {text}")
+    #             else:
+    #                 lines.append(f"- **{node}**: {text}")
 
-        return "\n".join(lines)
+    #     return "\n".join(lines)
 
     def _notify_simple(self, task, success, elapsed):
         status = "成功" if success else "失败"
@@ -287,10 +291,13 @@ class TaskRunner:
             entry = watch.get(node) if isinstance(watch, dict) else None
             mode, label, strip = self._parse_watch_entry(entry)
 
-            # 剥掉前缀（如果配了）
-            display_text = text
-            if strip and display_text.startswith(strip):
-                display_text = display_text[len(strip):]
+            # 优先用配置的固定值，否则用识别文本
+            if isinstance(entry, dict) and "value" in entry:
+                display_text = entry["value"]
+            else:
+                display_text = text
+                if strip and display_text.startswith(strip):
+                    display_text = display_text[len(strip):].strip()
 
             if label:
                 lines.append(f"- **{label}**: {display_text}")
