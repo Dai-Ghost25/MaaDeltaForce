@@ -31,3 +31,6 @@ settings.txt
 id_rsa
 id_ed25519
 secrets.json
+
+# debug
+debug/

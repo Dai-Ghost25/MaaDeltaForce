@@ -30,6 +30,15 @@ schedules:
       - 邮件检查
       - 关闭游戏
 
+  - name: 周日材料购买
+    enabled: true
+    trigger:
+      type: cron
+      expr: "0 3 * * 7"
+    task: 交易行扫描
+    params:
+      list_name: 周日材料购买
+
   - name: 每晚自动大战场
     enabled: true
     trigger:

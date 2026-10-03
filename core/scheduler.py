@@ -11,7 +11,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
-from core.config import PROJECT_ROOT
+from core.config import SCHEDULES_FILE
 from core.task_runner import get_runner
 
 logger = logging.getLogger(__name__)
@@ -73,6 +73,7 @@ class ScheduleManager:
         if s is None:
             return
 
+        # 运行次数检查
         with self._lock:
             if s.get("max_runs") and self.run_counts[name] >= s["max_runs"]:
                 logger.info(f"[{name}] 已达最大运行次数，禁用")
@@ -82,6 +83,7 @@ class ScheduleManager:
 
         logger.info(f"===== 触发定时任务: {name} (第 {self.run_counts[name]} 次) =====")
 
+        # stop_when 配置
         stop_when = s.get("stop_when") or []
         stop_flag = {"stop": False}
 
@@ -95,15 +97,23 @@ class ScheduleManager:
                     return True
             return False
 
-        runner = get_runner()
+        # ---- 执行：支持两种语法 ----
         try:
-            for task_name in s["tasks"]:
-                if stop_flag["stop"]:
-                    logger.info(f"[{name}] stop_when 命中，跳过剩余任务")
-                    break
-                runner.run_task(task_name, stop_checker=stop_checker)
+            if "task" in s:
+                # 新语法：单任务 + params
+                self._run_single_task(s["task"], s.get("params", {}), stop_checker)
+            elif "tasks" in s:
+                # 旧语法：任务列表
+                for task_name in s["tasks"]:
+                    if stop_flag["stop"]:
+                        logger.info(f"[{name}] stop_when 命中，跳过剩余任务")
+                        break
+                    self._run_single_task(task_name, {}, stop_checker)
         finally:
-            runner.flush_notifications()
+            # 只 flush 已存在的 TaskRunner
+            from core import task_runner
+            if task_runner._runner is not None:
+                task_runner._runner.flush_notifications()
 
         logger.info(f"===== 定时任务结束: {name} =====")
 
@@ -117,6 +127,26 @@ class ScheduleManager:
             import re
             return re.search(value, text) is not None
         return False
+
+    def _run_single_task(self, task_name: str, params: dict, stop_checker=None):
+        """
+        执行单个任务。可能是：
+        - 函数任务（如"交易行扫描"）
+        - pipeline 任务（如"邮件检查"）
+        """
+        # ---- 函数任务分发 ----
+        if task_name == "交易行扫描":
+            from core.trade_flow import run_scan_all
+            logger.info(f"执行函数任务: 交易行扫描, 参数={params}")
+            run_scan_all(
+                items=params.get("items"),
+                list_name=params.get("list_name"),
+            )
+            return
+
+        # ---- pipeline 任务 ----
+        runner = get_runner()
+        runner.run_task(task_name, stop_checker=stop_checker)
 
     # ---- 生命周期 ----
 

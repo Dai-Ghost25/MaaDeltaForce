@@ -1,0 +1,152 @@
+{
+    "交易行":{
+        "next":[
+            "识别改枪台为主页-交易行",
+            "[JumpBack]识别设置2"
+        ]
+    },
+    "识别改枪台为主页-交易行":{
+        "recognition":"OCR",
+        "expected": "改枪台",
+        "roi":[596, 658, 65, 26],
+        "next":[
+            "进入交易行"
+        ]
+    },
+    "进入交易行":{
+        "recognition":"OCR",
+        "expected": "交易行",
+        "roi":[260, 658, 65, 26],
+        "action":"Click",
+        "next":[
+            "滑动筛选项至顶部"
+        ]
+    },
+    "滑动筛选项至顶部":{
+        "action":"Swipe",
+        "begin":[140, 198, 41, 24],
+        "end":[140, 600, 41, 24],
+        "duration":100,
+        "next":[
+            "识别收藏并点击"
+        ]
+    },
+    "识别收藏并点击":{
+        "recognition":"OCR",
+        "expected": "收藏",
+        "roi":[130, 133, 40, 23],
+        "action":"Click"
+    },
+    "确保进入交易行收藏页":{
+        "next":[
+            "检测在收藏页",
+            "进入交易行入口"
+        ]
+    },
+    "检测在收藏页":{
+        "recognition":"OCR",
+        "expected":"收藏",
+        "roi":[130, 133, 40, 23]
+    },
+    "进入交易行入口":{
+        "next":["进入交易行"]
+    },
+    "识别商品坐标":{
+        "recognition":"OCR",
+        "expected": "PLACEHOLDER",
+        "roi":[350,150,750,550],
+        "next":[
+            "进入商品"
+        ]
+    },
+    "进入商品":{
+        "action":"Click",
+        "target": "识别商品坐标"
+    },
+    "检测兑换":{
+        "recognition":"OCR",
+        "expected":"兑换",
+        "roi":[932,632,47,32],
+        "timeout": 2000
+    },
+    "MAX!-有兑换":{
+        "action":"Swipe",
+        "begin":[1004, 506],
+        "end":[1080, 506],
+        "duration":50,
+        "next":[
+            "识别价格"
+        ]
+    },
+    "MAX!-无兑换":{
+        "action":"Swipe",
+        "begin":[1004, 566],
+        "end":[1080, 566],
+        "duration":50,
+        "next":["识别价格"]
+    },
+    "识别价格":{
+        "recognition":"OCR",
+        "expected": "\\d",
+        "roi":[67, 648, 70, 20]
+    },
+    "买入-有兑换":{
+        "action":"Click",
+        "target":[951, 571, 34, 21]
+    },
+    "买入-无兑换":{
+        "action":"Click",
+        "target":[927, 625, 83, 25]
+    },
+    "点击哈夫币位置":{
+        "action":"Click",
+        "target":[971, 27],
+        "next":[
+            "识别余额"
+        ]
+    },
+    "识别余额":{
+        "recognition":"OCR",
+        "expected":"\\d",
+        "roi":[880, 71, 110, 20]
+    },
+    "返回商品收藏页面":{
+        "action": "Click",
+       "target": [13, 13, 29, 32],
+       "post_delay":0,
+       "next":[
+        "进入商品"
+       ]
+    },
+    "回到收藏页":{
+        "next":[
+            "检测在收藏页2",
+            "点返回"
+        ]
+    },
+    "检测在收藏页2":{
+        "recognition":"OCR",
+        "expected":"收藏",
+        "roi":[130, 133, 40, 23]
+    },
+    "点返回":{
+        "action": "Click",
+        "target": [13, 13, 29, 32],
+        "post_delay": 500
+    },
+    "确保在主页面":{
+        "next":["识别改枪台为主页-交易行2", "点返回-主页面"]
+    },
+    "识别改枪台为主页-交易行2":{
+        "recognition":"OCR",
+        "expected": "改枪台",
+        "roi":[596, 658, 65, 26],
+        "timeout":800
+    },
+    "点返回-主页面":{
+        "action":"Click",
+        "target":[13, 13, 29, 32],
+        "post_delay":500,
+        "next":["确保在主页面"]
+    }
+}
