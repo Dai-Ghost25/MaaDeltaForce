@@ -193,10 +193,21 @@ class TaskRunner:
 
     # ---- 执行任务 ----
 
-    def run_task(self, task_name: str, stop_checker=None, pipeline_override=None) -> bool:
+    def run_task(
+        self,
+        task_name: str,
+        stop_checker=None,
+        pipeline_override=None,
+        notify: str | None = None,
+    ) -> bool:
+        """
+        notify: 覆盖任务自身的通知设置（none / simple / report）。
+                None = 用 core.config.TASKS 里配置的 notify。
+        """
         task = self.cfg.get_task(task_name)
         entry = task["entry"]
-        notify = task.get("notify", "none")
+        if notify is None:
+            notify = task.get("notify", "none")
 
         self._current = task
         self._captured = []

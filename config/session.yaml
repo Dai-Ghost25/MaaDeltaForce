@@ -1,0 +1,140 @@
+# timebox.yaml
+#
+# 时间盒（会话）：一次启动 → 多次 body → 一次关闭
+#
+#   python mdf.py timebox list                     查看所有档案
+#   python mdf.py timebox show 通宵挂机              查看某个档案实际生效的约束
+#   python mdf.py timebox run 通宵挂机 -d 4h --dry-run   只试算，不连设备
+#   python mdf.py timebox run 通宵挂机               前台运行（Ctrl+C 停止）
+#   python mdf.py chain 一天                         按顺序跑好几个档案
+#
+# 字段说明
+# --------
+#   startup       启动阶段，只跑一次，例如 [启动游戏, 切换到全面战场]
+#   body          循环阶段，例如 [蜂医挂机]
+#   shutdown      关闭阶段，只跑一次，例如 [关闭游戏]；不写就结束时不停游戏
+#   body_repeat   body 跑几次；0 或 -1 = 不限（由时间决定何时停）
+#   repeat        整个会话重复几轮；0 或 -1 = 不限
+#   duration      总时长，支持 8h / 30m / 1h30m / 90s / 2天
+#   until         绝对截止时刻，例如 "12:00"（到今天这个点为止）
+#   active        允许运行的时间窗，例如 "07:30~23:00"；跨午夜写 "23:00~07:30"
+#   quiet         安静时段，到点不再开始新的 body，例如 "23:00~07:30"
+#   wait_quiet    命中安静时段时等到时段结束再继续（默认 false = 直接收尾）
+#   skip_if_missed 时间窗没到就跳过（默认 false = 等到窗口打开）
+#   force_cut     到点立即中断当前任务（默认 false = 跑完当前一次）
+#   interval      body 之间的间隔秒数
+#   keep_open     结束时保持游戏运行，交给下一个会话（默认 false）
+#   notify        覆盖任务自身的钉钉通知（none / simple / report）
+#   max_wait      等待下一次时间窗打开的上限秒数
+#   enabled       false = timebox list 里仍然显示，但 chain 会跳过
+#
+# 兼容老写法：只写 tasks（不写 startup/body/shutdown）时，整轮重复。
+
+defaults:
+  body_repeat: -1        # 默认不限次数，由时间约束决定什么时候停
+  interval: 0
+  force_cut: false
+  notify: none
+
+sessiones:
+  # ============ 收菜 ============
+  # 一次启动 → 收菜 N 次 → 一次关闭。body_repeat=6 + interval=5分钟 大约覆盖 8 小时。
+  - name: 八小时收菜
+    description: 启动一次，收菜 6 次后关闭（每轮间隔 8h + 5分钟）
+    startup:
+      - 启动游戏
+    body: [切换到烽火地带,一键收菜]
+    shutdown:
+      - 关闭游戏
+    body_repeat: 3
+    interval: 29100
+
+  # 不限次数版本：从现在起最多 8 小时，到点跑完当前一次就关闭游戏
+  - name: 收菜到点停
+    description: 连续收菜，最多 8 小时
+    startup: [启动游戏]
+    body: [一键收菜]
+    shutdown: [关闭游戏]
+    duration: 8h
+    interval: 300
+
+  # 简单收一次菜，包含整套流程
+  - name: 一键收菜
+    description: 启动一次，收完菜退出游戏
+    startup:
+      - 启动游戏
+      - 切换到烽火地带
+    body: 
+      - 一键收菜
+    shutdown:
+      - 关闭游戏
+    body_repeat: 1
+
+  # ============ 全面战场挂机 ============
+  # 核心场景：启动 + 切模式只做一次，蜂医挂机跑一整晚，最后关一次游戏。
+  - name: 通宵挂机
+    description: 02:00 开始，挂到 08:00（到点不再开新的一局，然后关闭游戏）
+    startup:
+      - 启动游戏
+      - 切换到全面战场
+    body:
+      - 蜂医挂机
+    shutdown:
+      - 关闭游戏
+    active: "02:00~08:30"      # 没到 02:00 就等着；到 08:00 不再开新的一局
+    body_repeat: -1
+
+  - name: 2-6点挂机
+    description: 02:00 开始，挂到 06:00（到点不再开新的一局，然后关闭游戏）
+    startup:
+      - 启动游戏
+      - 切换到全面战场
+    body:
+      - 蜂医挂机
+    shutdown:
+      - 关闭游戏
+    active: "02:00~06:00"
+    body_repeat: -1
+
+  # 只挂固定局数，用来试水
+  - name: 挂三局
+    description: 启动一次，挂 3 局后关闭
+    startup: [启动游戏, 切换到全面战场]
+    body: [蜂医挂机]
+    shutdown: [关闭游戏]
+    body_repeat: 3
+
+  # 手动补场：睡前来一发，跑 4 小时
+  - name: 午间挂机
+    description: 手动启动，连续挂机 4 小时
+    startup: [启动游戏, 切换到全面战场]
+    body: [蜂医挂机]
+    shutdown: [关闭游戏]
+    duration: 4h
+
+  # 22:00 之后不再开新局（在跑的那局会跑完），然后关闭游戏
+  - name: 大战场到点收工
+    description: 一直挂到 22:00 收工
+    startup: [启动游戏, 切换到全面战场]
+    body: [蜂医挂机]
+    shutdown: [关闭游戏]
+    quiet: "23:00~1:30"
+
+  # 结束后保持游戏运行，交给下一个会话说「我已经开着了」
+  - name: 挂机不关游戏
+    description: 跑 2 小时后只关闭，不停游戏（自己手动收尾）
+    startup: [启动游戏, 切换到全面战场]
+    body: [蜂医挂机]
+    body_repeat: -1
+    duration: 2h
+    keep_open: true
+
+  # ============ 调试用 ============
+  - name: 三轮试跑
+    description: 跑 3 轮邮件检查就停（用来验证配置）
+    startup: []
+    body: [邮件检查]
+    body_repeat: 3
+    interval: 10
+    enabled: true
+
