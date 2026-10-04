@@ -174,7 +174,7 @@
         "expected": "请放入生产图纸",
         "roi":[724, 454, 107, 20],
         "next":[
-            ".300 BLK",
+            "4.6x30mm AP SX",
             "复合弓",
             "精密护甲维修包",
             "精英防弹背心"
@@ -307,6 +307,16 @@
     "复合弓":{
         "recognition":"OCR",
         "expected": "复合弓",
+        "roi":[100, 160, 250, 500],
+        "action":"Click",
+        "next":[
+            "生产",
+            "一键补齐"
+        ]
+    },
+    "4.6x30mm AP SX":{
+        "recognition":"OCR",
+        "expected": ".300 BLK",
         "roi":[100, 160, 250, 500],
         "action":"Click",
         "next":[

@@ -1,15 +1,15 @@
 {
     "1test1":{
         "recognition":"TemplateMatch",
-        "template":"GTI绿.jpg",
-        "roi":[100,100,900,400]
+        "template":"下车.jpg",
+        "roi":[1087, 260, 48, 37]
     },
     "1test2":{
         "recognition":"OCR",
-        "expected": "烟幕",
-        "roi":[270,200,350,250]
+        "expected":"烽火地带",
+        "roi":[25,575,320,75]
     },
     "1test3":{
-        "next":["1test2"]
+        "next":["关闭广告"]
     }
 }

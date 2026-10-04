@@ -5,18 +5,19 @@ import signal
 import logging
 import threading
 from pathlib import Path
+from datetime import datetime
 
 import yaml
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
-from core.config import PROJECT_ROOT
+from core.config import SCHEDULES_FILE
 from core.task_runner import get_runner
 
 logger = logging.getLogger(__name__)
 
-SCHEDULES_FILE = PROJECT_ROOT / "schedules.yaml"
+# SCHEDULES_FILE = PROJECT_ROOT / "schedules.yaml"
 
 
 class ScheduleManager:
@@ -95,17 +96,135 @@ class ScheduleManager:
                     return True
             return False
 
-        runner = get_runner()
         try:
-            for task_name in s["tasks"]:
-                if stop_flag["stop"]:
-                    logger.info(f"[{name}] stop_when 命中，跳过剩余任务")
-                    break
-                runner.run_task(task_name, stop_checker=stop_checker)
+            if "session" in s:
+                # 引用 session.yaml 里的档案
+                self._run_session_ref(s, stop_checker)
+            elif self._is_lifecycle(s):
+                # 内联会话语法（startup / body / shutdown）
+                self._run_lifecycle(s, stop_checker)
+            elif "task" in s:
+                # 单任务 + params
+                self._run_single_task(s["task"], s.get("params", {}), stop_checker)
+            elif "tasks" in s:
+                # 老语法：任务列表，线性执行一遍
+                for task_name in s["tasks"]:
+                    if stop_flag["stop"]:
+                        logger.info(f"[{name}] stop_when 命中，跳过剩余任务")
+                        break
+                    self._run_single_task(task_name, {}, stop_checker)
+            else:
+                logger.error(f"[{name}] 未识别的 schedule 结构，跳过")
+        except Exception as e:
+            logger.exception(f"[{name}] 执行失败: {e}")
         finally:
-            runner.flush_notifications()
+            from core import task_runner
+            for r in getattr(task_runner, "_runners", {}).values():
+                try:
+                    r.flush_notifications()
+                except Exception as e:
+                    logger.warning(f"flush 通知失败: {e}")
 
         logger.info(f"===== 定时任务结束: {name} =====")
+
+# ---- 会话语法：startup / body / shutdown ----
+
+    LIFECYCLE_KEYS = (
+        "startup", "body", "shutdown", "body_repeat",
+        "duration", "until", "active", "quiet", "wait_quiet",
+        "skip_if_missed", "force_cut", "keep_open", "max_wait", "interval",
+    )
+
+    @classmethod
+    def _is_lifecycle(cls, s: dict) -> bool:
+        """是不是会话语法。"""
+        if any(k in s for k in ("startup", "body", "shutdown", "body_repeat")):
+            return True
+        # 只写 tasks + 时间约束时，也用会话语义跑
+        return "tasks" in s and any(k in s for k in cls.LIFECYCLE_KEYS)
+
+    def _run_lifecycle(self, s: dict, stop_checker=None):
+        """把 schedules.yaml 里的一条配置当成会话来跑。"""
+        from core.session import run_session
+        from core import session_config as tcc
+        from core import task_runner
+
+        cfg = dict(s)
+        cfg.setdefault("name", s["name"])
+        cfg.setdefault("body", list(s.get("tasks") or []))
+        if s.get("task") and not cfg.get("body"):
+            cfg["body"] = [s["task"]]
+
+        box = tcc.build(s["name"], profile=cfg)
+        box.start_time = datetime.now()
+
+        runner = _ScheduleRunner(
+            stop_checker=stop_checker,
+            params=s.get("params") or {},
+            runner_factory=task_runner.get_runner,
+        )
+        result = run_session(runner, box, verbose=False)
+        logger.info(
+            f"[{s['name']}] 会话结束: {result.reason_label}"
+            f"（{result.rounds} 轮 / body {result.body_runs} 次 / "
+            f"成功 {result.success} 失败 {result.failed}）"
+        )
+        return result
+
+    # 调度元数据字段（不参与覆盖 session 档案）
+    _SCHEDULE_META = {
+        "name", "session", "trigger", "enabled",
+        "max_runs", "stop_when", "params",
+    }
+
+    def _run_session_ref(self, s: dict, stop_checker=None):
+        """引用 session.yaml 里的档案来跑。schedule 里的其他字段会覆盖档案同名字段。"""
+        from core.session import run_session
+        from core import session_config as tcc
+        from core import task_runner
+
+        session_name = s["session"]
+        try:
+            profile = tcc.get_profile(session_name)
+        except KeyError:
+            logger.error(f"[{s['name']}] 未找到会话档案: {session_name}")
+            return None
+        except Exception as e:
+            logger.error(f"[{s['name']}] 加载档案 {session_name} 失败: {e}")
+            return None
+
+        # schedule 里除元数据外的字段作为覆盖项
+        overrides = {
+            k: v for k, v in s.items()
+            if k not in self._SCHEDULE_META
+        }
+
+        try:
+            cfg = tcc.merge(
+                profile=profile,
+                overrides=overrides,
+                defaults=tcc.get_defaults(),
+            )
+            cfg["name"] = s["name"]
+            box = tcc.build(s["name"], profile=cfg)
+        except Exception as e:
+            logger.error(f"[{s['name']}] 构造会话失败: {e}")
+            return None
+
+        box.start_time = datetime.now()
+
+        runner = _ScheduleRunner(
+            stop_checker=stop_checker,
+            params=s.get("params") or {},
+            runner_factory=task_runner.get_runner,
+        )
+        result = run_session(runner, box, verbose=False)
+        logger.info(
+            f"[{s['name']}] 会话结束: {result.reason_label}"
+            f"（{result.rounds} 轮 / body {result.body_runs} 次 / "
+            f"成功 {result.success} 失败 {result.failed}）"
+        )
+        return result
 
     @staticmethod
     def _match(text: str, mode: str, value: str) -> bool:
@@ -117,6 +236,26 @@ class ScheduleManager:
             import re
             return re.search(value, text) is not None
         return False
+
+    def _run_single_task(self, task_name: str, params: dict, stop_checker=None):
+        """
+        执行单个任务。可能是：
+        - 函数任务（如"交易行扫描"）
+        - pipeline 任务（如"邮件检查"）
+        """
+        # ---- 函数任务分发 ----
+        if task_name == "交易行扫描":
+            from core.trade_flow import run_scan_all
+            logger.info(f"执行函数任务: 交易行扫描, 参数={params}")
+            run_scan_all(
+                items=params.get("items"),
+                list_name=params.get("list_name"),
+            )
+            return
+
+        # ---- pipeline 任务 ----
+        runner = get_runner()
+        runner.run_task(task_name, stop_checker=stop_checker)
 
     # ---- 生命周期 ----
 
@@ -150,15 +289,58 @@ class ScheduleManager:
         if self._sched.running:
             self._sched.shutdown(wait=False)
 
-        # 只 flush 已经存在的 TaskRunner，不要主动触发初始化
         from core import task_runner
-        if task_runner._runner is not None:
+        for r in getattr(task_runner, "_runners", {}).values():
             try:
-                task_runner._runner.tasker.post_stop()   # 停止正在跑的任务
+                r.tasker.post_stop()
             except Exception as e:
                 logger.warning(f"停止 Tasker 失败: {e}")
             try:
-                task_runner._runner.flush_notifications()
-                task_runner._runner.notifier.shutdown()
+                r.flush_notifications()
+                r.notifier.shutdown()
             except Exception as e:
                 logger.warning(f"关闭时 flush 通知失败: {e}")
+
+# ---------- 让会话可以直接用定时任务里的「函数任务」 ----------
+
+class _ScheduleRunner:
+    """
+    把 TaskRunner 包一层，补上两个东西：
+      1. 函数任务（交易行扫描）的分发
+      2. 定时任务里的 stop_checker / params 传递
+    """
+
+    def __init__(self, stop_checker=None, params: dict = None, runner_factory=None):
+        self.stop_checker = stop_checker
+        self.params = params or {}
+        self._factory = runner_factory or get_runner
+
+    @property
+    def runner(self):
+        return self._factory()
+
+    def run_task(self, name, stop_checker=None, pipeline_override=None, notify=None):
+        if name == "交易行扫描":
+            from core.trade_flow import run_scan_all
+            logger.info(f"执行函数任务: 交易行扫描, 参数={self.params}")
+            run_scan_all(
+                items=self.params.get("items"),
+                list_name=self.params.get("list_name"),
+            )
+            return True
+
+        checker = stop_checker or self.stop_checker
+        return self.runner.run_task(
+            name,
+            stop_checker=checker,
+            pipeline_override=pipeline_override,
+            notify=notify,
+        )
+
+    def flush_notifications(self):
+        from core import task_runner
+        for r in task_runner._runners.values():
+            try:
+                r.flush_notifications()
+            except Exception as e:
+                logger.warning(f"flush 失败: {e}")

@@ -1,4 +1,11 @@
 {
+    "切换到[烽火地带]":{
+        "timeout":10000,
+        "next":[
+            "识别改枪台为主页",
+            "识别设置2"
+        ]
+    },
     "识别设置2":{
         "recognition":"OCR",
         "expected": "设置",
@@ -11,8 +18,9 @@
     "切换[烽火地带]":{
         "recognition":"OCR",
         "expected": "烽火地带",
-        "roi":[331, 479, 104, 30],
+        "roi":[331, 470, 120, 35],
         "action":"Click",
+        "post_delay":1000,
         "next":[
             "确认切换[烽火地带]"
         ]
@@ -34,6 +42,7 @@
         ],
         "box_index":0,
         "action":"Click",
+        "post_delay":2000,
         "next":[
             "关闭广告",
             "识别改枪台为主页"

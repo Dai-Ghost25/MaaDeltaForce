@@ -1,0 +1,166 @@
+# ============================================================
+# schedules.yaml
+# ============================================================
+#
+# 定时任务配置。daemon 常驻，按 cron / interval 触发。
+#   启动: python mdf.py schedule daemon
+#
+# 一条 schedule 有四种写法，按优先级判断：
+#
+#  ① 引用会话档案（推荐，需 session.yaml 里有同名档案）
+#      - name: 一键收菜
+#        trigger: {type: cron, expr: "0 8 * * *"}
+#        session: 一键收菜            # ← 引用 session.yaml 里的档案
+#        # 可以覆盖档案字段：
+#        duration: 2h
+#        body_repeat: 3
+#
+#  ② 内联会话语法（不依赖档案）
+#      - name: 一键收菜
+#        trigger: {type: cron, expr: "0 8 * * *"}
+#        startup:  [启动游戏, 切换到烽火地带]
+#        body:     [一键收菜]
+#        shutdown: [关闭游戏]
+#        body_repeat: 1
+#        interval: 300
+#        active: "07:00~22:00"
+#
+#  ③ 单任务 + params（函数任务，如交易行扫描）
+#      - name: 周日材料购买
+#        trigger: {type: cron, expr: "0 3 * * 7"}
+#        task: 交易行扫描
+#        params: {list_name: 周日材料购买}
+#
+#  ④ 任务列表（老写法，线性执行一遍）
+#      - name: 每晚检查邮件
+#        trigger: {type: cron, expr: "0 1 * * *"}
+#        tasks: [启动游戏, 邮件检查, 关闭游戏]
+#
+# ------------------------------------------------------------
+# 通用字段
+# ------------------------------------------------------------
+#   name          [必填] 调度名，唯一；log/list 里显示
+#   enabled       [可选] 默认 true；false 时 daemon 不注册
+#   trigger       [必填] 触发条件：
+#                   {type: cron, expr: "分 时 日 月 周"}
+#                   {type: interval, seconds: N}
+#   max_runs      [可选] 跑满 N 次后自动禁用
+#   stop_when     [可选] 命中识别结果时提前停止：
+#                   - {node: 过期时间, match: contains, value: 已过期}
+#                 match 可选 contains / equals / regex
+#   params        [可选] 传给函数任务（如交易行扫描）的参数
+#
+# ------------------------------------------------------------
+# 会话语义字段（session 引用 / 内联 都支持）
+# ------------------------------------------------------------
+#   session       引用 session.yaml 里的档案名（仅引用模式用）
+#   startup       启动阶段，只跑一次
+#   body          循环阶段，跑 N 次 / 到点停
+#   shutdown      关闭阶段，只跑一次
+#   body_repeat   body 跑几次；-1/0 = 不限
+#   repeat        整个会话重复几轮；-1/0 = 不限
+#   duration      总时长，例如 8h / 30m / 1h30m
+#   until         绝对截止时刻，例如 "12:00"（当天）
+#   active        允许运行的时间窗，例如 "02:00~08:00"
+#   quiet         安静时段，到点不再开新 body
+#   wait_quiet    命中安静时段是否等到结束（默认 false = 直接收尾）
+#   skip_if_missed 未进入时间窗时跳过（默认 false = 等待）
+#   force_cut     到点是否立即中断（默认 false = 跑完当前）
+#   interval      body 之间的间隔秒数
+#   keep_open     结束时保持游戏运行（留给下一个会话）
+#   notify        覆盖任务自身钉钉通知（none/simple/report）
+#   max_wait      等待时间窗打开的上限秒数
+#
+# ------------------------------------------------------------
+
+
+schedules:
+  - name: 每晚检查邮件
+    enabled: true
+    trigger:
+      type: cron
+      expr: "0 1 * * *"          # 每天 1点启动
+    tasks:
+      - 启动游戏
+      - 邮件检查
+      - 关闭游戏
+      
+
+  - name: 8小时自动收菜
+    enabled: false
+    trigger:
+      type: interval
+      seconds: 29100                # 8小时+5分钟
+    startup:
+      - 启动游戏
+      - 切换到烽火地带
+    body:
+      - 一键收菜
+    shutdown:
+      - 关闭游戏
+
+  - name: test
+    enabled: false
+    trigger:
+      type: interval
+      seconds: 300                # 5分钟
+    tasks:
+      - 启动游戏
+      - 邮件检查
+      - 关闭游戏
+
+  - name: 周日材料购买
+    enabled: false
+    trigger:
+      type: cron
+      expr: "0 3 * * 7"
+    task: 交易行扫描
+    params:
+      list_name: 周日材料购买
+
+  - name: 每晚自动大战场
+    enabled: false
+    trigger:
+      type: cron
+      expr: "0 2 * * *"          # 每天 2点启动
+    tasks:
+      - 启动游戏
+      - 切换到全面战场
+      - 蜂医挂机
+      - 蜂医挂机          # 3点
+      - 蜂医挂机
+      - 蜂医挂机          # 4点
+      - 蜂医挂机
+      - 蜂医挂机          # 5点
+      - 蜂医挂机
+      - 蜂医挂机          # 6点
+      - 蜂医挂机
+      - 蜂医挂机          # 7点
+      - 关闭游戏
+
+  - name: 测试会话
+    enabled: false
+    trigger:
+      type: interval
+      seconds: 600         # 10 分钟一次，方便测
+    startup:
+      - 启动游戏
+    body:
+      - 邮件检查
+    shutdown:
+      - 关闭游戏
+    body_repeat: 1
+
+  - name: 2-6点大战场
+    enabled: true
+    trigger:
+      type: cron
+      expr: "0 2 * * *"
+    session: 2-6点挂机 
+
+  - name: 一键收菜
+    enabled: true
+    trigger:
+      type: interval
+      seconds: 29100
+    session: 一键收菜

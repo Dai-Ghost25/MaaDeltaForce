@@ -1,0 +1,37 @@
+# ============================================
+# 设备配置
+# ============================================
+#
+# 切换设备:
+#   临时:  python mdf.py -D <设备名> <命令>
+#   环境:  export MDF_DEVICE=<设备名>
+#   默认:  python mdf.py device use <设备名>
+#
+# profile 字段（预留，暂未启用）:
+#   不同设备因安全边距/长宽比不同，可能需要不同坐标集。
+#   将来启用时按 profile 加载 config/coords_<profile>.yaml。
+#   现阶段所有设备共用 pipeline 里写死的坐标。
+
+default: oppo
+
+devices:
+  S9:
+    adb_address: "192.168.1.169:5555"
+    profile: pad
+    description: "三星平板，初始设备"
+    resolution: "2560x1600"
+
+  oppo:
+    adb_address: "192.168.1.167:5555"
+    profile: phone
+    description: "1080x2340 手机，改分辨率为1080x1728"
+    resolution: "1080x2340"
+
+# ---------- profile 定义（暂未启用） ----------
+profiles:
+  S9:
+    coords_file: "config/coords_pad.yaml"
+    description: "平板基准坐标"
+  oppo:
+    coords_file: "config/coords_phone_1080.yaml"
+    description: "1080x2340 手机坐标"

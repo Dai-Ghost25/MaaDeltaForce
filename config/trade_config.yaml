@@ -1,0 +1,64 @@
+items:
+  原木木板:
+    layout: "无兑换"
+    scan_repeat: 1          #扫描次数
+    buy:
+      below: 5000
+      enabled: true
+      qty: 10
+    sell:
+      above: 8000
+      enabled: false
+    bargain:
+      enabled: false
+    item_id: 1221
+
+  5.56x45mm M855A1:
+    layout: "有兑换"
+    scan_repeat: 10
+    buy:
+      below: 1611
+      enabled: true
+      qty: 200
+    sell:
+      above: 2200
+      enabled: false
+    bargain:
+      enabled: true
+      target_price: 1581       # 到价立即买
+      accept_price: 1611       # 刷满后仍低于此值也买
+      max_refresh: 2          # 最多刷几次
+      refresh_action: "返回商品收藏页面"   # ← 新增：刷新的 Pipeline 入口名
+      enter_action: "进入商品"              # ← 新增：首次进入的 Pipeline 入口名
+    item_id: 636
+
+  9x19mm RIP:
+    buy:
+      below: 850
+      enabled: false
+      qty: 200
+    sell:
+      above: 1200
+      enabled: false
+    bargain:
+      enabled: false
+    item_id: 999
+
+scan:
+  default_list: 周日材料购买        # ← 默认用哪个清单
+  interval_seconds: 2
+
+
+# ============================================
+# 预定义商品清单
+# ============================================
+
+item_lists:
+  周日材料购买:
+    - 原木木板
+  5.56子弹购买:
+    - 5.56x45mm M855A1
+  全量:
+    - 原木木板
+    - 5.56x45mm M855A1
+    - 9x19mm RIP
