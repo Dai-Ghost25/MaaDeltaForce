@@ -1,11 +1,20 @@
 {
+    "启动游戏":{
+        "timeout":40000,
+        "next":[
+            "识别改枪台为主页",
+            "StartApp"
+        ]
+    },
     "StartApp":{
         "action":"StartApp",
         "package":"com.tencent.tmgp.dfm",
         "post_delay": 20000,
+        "timeout":40000,
         "next":[
             "QQ登录",
-            "进入烽火地带"
+            "进入烽火地带",
+            "识别改枪台为主页"
         ]
     },
     "QQ登录":{
@@ -13,6 +22,7 @@
         "expected": "QQ登录",
         "roi":[668, 568, 72, 25],
         "action":"Click",
+        "timeout":20000,
         "next":[
             "切换账号",
             "进入烽火地带"
@@ -24,21 +34,21 @@
         "roi":[547, 622, 55, 18],
         "action":"Click",
         "next":[
-            "选择QQ：123456789"
+            "123456789"
         ]
     },
-    "选择QQ：32165489":{
+    "123456789":{
         "recognition":"OCR",
-        "expected": "32165489",
+        "expected": "123456789",
         "roi":[75, 507, 80, 186],
         "action":"Click",
         "next":[
             "QQ点击同意"
         ]
     },
-    "选择QQ：123456799":{
+    "选择QQ：123456789":{
         "recognition":"OCR",
-        "expected": "123456987",
+        "expected": "123456789",
         "roi":[75, 507, 80, 186],
         "action":"Click",
         "next":[
@@ -67,9 +77,11 @@
     "进入烽火地带":{
         "recognition":"OCR",
         "expected": "烽火地带",
-        "roi":[25,575,400,75],
+        "roi":[25,575,320,75],
         "action":"Click",
+        "timeout":20000,
         "next":[
+            "进入烽火地带",
             "关闭广告",
             "识别改枪台为主页"
         ]
@@ -80,6 +92,7 @@
         "roi":[1047, 10, 65, 64],
         "action":"Click",
         "next":[
+            "关闭广告",
             "识别改枪台为主页"
         ]
     },

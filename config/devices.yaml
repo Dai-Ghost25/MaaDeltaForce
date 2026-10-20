@@ -12,9 +12,15 @@
 #   将来启用时按 profile 加载 config/coords_<profile>.yaml。
 #   现阶段所有设备共用 pipeline 里写死的坐标。
 
-default: oppo
+default: 16-9
 
 devices:
+  16-9:
+    adb_address: "192.168.1.169:5555"
+    profile: pad
+    description: "三星平板，模拟16:9设备"
+    resolution: "2560x1440"
+
   S9:
     adb_address: "192.168.1.169:5555"
     profile: pad
@@ -26,6 +32,12 @@ devices:
     profile: phone
     description: "1080x2340 手机，改分辨率为1080x1728"
     resolution: "1080x2340"
+
+  vivoPad:
+    adb_address: "192.168.1.169:5555"
+    profile: pad
+    description: "三星平板，模拟vivo平板"
+    resolution: "2400x1600"
 
 # ---------- profile 定义（暂未启用） ----------
 profiles:

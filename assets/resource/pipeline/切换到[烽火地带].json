@@ -1,48 +1,51 @@
 {
-    "切换到[烽火地带]":{
-        "next":[
+    "切换到[烽火地带]": {
+        "timeout": 10000,
+        "next": [
             "识别改枪台为主页",
             "识别设置2"
         ]
     },
-    "识别设置2":{
-        "recognition":"OCR",
+    "识别设置2": {
+        "recognition": "OCR",
         "expected": "设置",
-        "roi":[1106, 40, 34, 18],
-        "action":"Click",
-        "next":[
+        "roi": [1229, 45, 37, 21],
+        "action": "Click",
+        "next": [
             "切换[烽火地带]"
         ]
     },
-    "切换[烽火地带]":{
-        "recognition":"OCR",
+    "切换[烽火地带]": {
+        "recognition": "OCR",
         "expected": "烽火地带",
-        "roi":[331, 470, 120, 35],
-        "action":"Click",
-        "post_delay":1000,
-        "next":[
+        "roi": [369, 447, 115, 32],
+        "_anchor": "bottom",
+        "action": "Click",
+        "post_delay": 1000,
+        "next": [
             "确认切换[烽火地带]"
         ]
     },
-    "确认切换[烽火地带]":{
-        "recognition":"And",
-        "all_of":[
+    "确认切换[烽火地带]": {
+        "recognition": "And",
+        "all_of": [
             {
-                "recognition":"OCR",
+                "recognition": "OCR",
                 "expected": "确认",
-                "roi":[694,466,46,27]
+                "roi": [773,480,48,26],
+                "_anchor": "center"
             },
             {
-                "recognition":"OCR",
+                "recognition": "OCR",
                 "expected": "烽火地带",
-                "roi":[456,291,240,20]
-                
+                "roi": [637,281,87,28],
+                "_anchor": "center"
             }
         ],
-        "box_index":0,
-        "action":"Click",
-        "post_delay":2000,
-        "next":[
+        "box_index": 0,
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
             "关闭广告",
             "识别改枪台为主页"
         ]
