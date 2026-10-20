@@ -1,0 +1,140 @@
+base_tolerance: 5
+coords:
+  # 进入技术中心:
+  #   target:
+  #     value: [297, 270, 11, 10]
+  #     align: none
+  # 进入工作台:
+  #   target:
+  #     value: [571, 253, 26, 25]
+  #     align: none
+  # 进入制药台:
+  #   target:
+  #     value: [269, 528, 52, 17]
+  #     align: none
+  # 进入防具台:
+  #   target:
+  #     value: [571, 528, 11, 10]
+  #     align: none
+  # 技术中心返回:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 工作台返回:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 制药台返回:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 防具台返回:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 全部完成:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 滑动筛选项至顶部:
+  #   begin:
+  #     value: [173, 198, 46, 24]
+  #     align: none
+  #   end:
+  #     value: [173, 600, 46, 24]
+  #     align: none
+  # MAX!-有兑换:
+  #   begin:
+  #     value: [1240, 506]
+  #     align: none
+  #   end:
+  #     value: [1333, 506]
+  #     align: none
+  # MAX!-无兑换:
+  #   begin:
+  #     value: [1240, 566]
+  #     align: none
+  #   end:
+  #     value: [1333, 566]
+  #     align: none
+  # 买入-有兑换:
+  #   target:
+  #     value: [1174, 571, 38, 21]
+  #     align: none
+  # 买入-无兑换:
+  #   target:
+  #     value: [1144, 625, 92, 25]
+  #     align: none
+  # 点击哈夫币位置:
+  #   target:
+  #     value: [1199, 27]
+  #     align: none
+  # 返回商品收藏页面:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 点返回:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 点返回-主页面:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 直接点击B1:
+  #   target:
+  #     value: [593, 277, 22, 20]
+  #     align: none
+  # 直接点击B1:
+  #   target: {value: [534, 277, 22, 20], align: none}
+  # 直接点击B2:
+  #   target: {value: [624, 278, 22, 20], align: none}
+  # 直接点击C1:
+  #   target: {value: [700, 211, 22, 20], align: none}
+  # 直接点击C2:
+  #   target: {value: [770, 270, 22, 20], align: none}
+  # 复活后蹲下:
+  #   target: {value: [1222, 270, 22, 20], align: right}
+  # 战术道具2:
+  #   target: {value: [709, 215, 22, 20], align: right}
+  # 战场道具:
+  #   target: {value: [856, 480, 22, 20], align: right}
+  # 视角向下并打药:
+  #   begin: {value: [1161, 185, 22, 20], align: right}
+  #   end:   {value: [667, 400, 22, 20], align: none}
+  # 扎针1:
+  #   target: {value: [1161, 185, 22, 20], align: right}
+  # 扎针2:
+  #   target: {value: [1161, 185, 22, 20], align: right}
+  # 扎针3:
+  #   target: {value: [1161, 185, 22, 20], align: right}
+  # 退出曼德尔砖分数页面:
+  #   roi: {value: [741, 100, 11, 10], align: none}
+  # 点击头像查看全面战场战绩:
+  #   target: {value: [28, 25, 11, 10], align: left}
+  # 点击第一个全面战场战绩:
+  #   target: {value: [233, 157, 130, 20], align: left}
+  # 返回历史战绩页面:
+  #   target: {value: [16, 13, 32, 32], align: left}
+  # 再点一次返回主页面:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none
+  # 滑动邮件1:
+  #   begin:
+  #     value: [370, 520, 22, 20]
+  #     align: none
+  #   end:
+  #     value: [370, 200, 22, 20]
+  #     align: none
+  # 滑动邮件2:
+  #   begin:
+  #     value: [370, 520, 22, 20]
+  #     align: none
+  #   end:
+  #     value: [370, 200, 22, 20]
+  #     align: none
+  # 返回主页:
+  #   target:
+  #     value: [16, 13, 32, 32]
+  #     align: none

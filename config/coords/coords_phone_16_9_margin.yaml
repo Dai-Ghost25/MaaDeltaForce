@@ -1,0 +1,6 @@
+profile: phone_16_9_margin
+resolution: [2560, 1440]
+game_rect: [0, 0, 2560, 1440]
+margin:
+  left: 50
+  right: 51

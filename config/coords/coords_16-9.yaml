@@ -1,0 +1,6 @@
+profile: pad_16_9
+resolution: [2560, 1440]
+game_rect: [0, 0, 2560, 1440]   # 游戏画面铺满整屏
+margin:
+  left: 0
+  right: 0

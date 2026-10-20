@@ -2,14 +2,15 @@
     "1test1":{
         "recognition":"TemplateMatch",
         "template":"下车.jpg",
-        "roi":[1087, 260, 48, 37]
+        "roi": [1128, 152, 85, 54],
+        "_anchor": "center",
+        "threshold": 0.5
     },
     "1test2":{
         "recognition":"OCR",
-        "expected":"烽火地带",
-        "roi":[25,575,320,75]
+        "expected":""
     },
     "1test3":{
-        "next":["关闭广告"]
+        "next":["点击头像查看全面战场战绩"]
     }
 }

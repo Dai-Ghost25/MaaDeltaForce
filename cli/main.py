@@ -10,12 +10,41 @@ from core.task_runner import get_runner
 logger = logging.getLogger(__name__)
 
 
-def setup_logging(verbose: bool):
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+def setup_logging(level_name: str = "info", log_file: str | None = None):
+    """
+    配置 Python logging：
+      - 控制台按 level_name 过滤（debug/info/warning/error/off）
+      - 文件固定 DEBUG 级别（记录完整信息）
+      - 根 logger 保持 DEBUG，由 handler 分级过滤
+    """
+    levels = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+        "off": logging.CRITICAL + 1,
+    }
+    level = levels.get(level_name.lower(), logging.INFO)
+
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    root.handlers.clear()
+
+    console = logging.StreamHandler()
+    console.setLevel(level)
+    console.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+    root.addHandler(console)
+
+    if log_file:
+        from pathlib import Path
+        log_path = Path(log_file)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        fh = logging.FileHandler(log_path, encoding="utf-8")
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+        ))
+        root.addHandler(fh)
 
 
 # ============================================================
@@ -646,7 +675,32 @@ def build_parser() -> argparse.ArgumentParser:
         prog="mdf",
         description="MaaDeltaForce 任务调度工具",
     )
-    parser.add_argument("-v", "--verbose", action="store_true", help="输出调试日志")
+
+    # ---- 日志控制 ----
+    parser.add_argument(
+        "-v", "--verbose", action="count", default=0,
+        help="快捷开启 Python DEBUG 日志（等价于 --log-level debug）；可叠加 -v -v"
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["debug", "info", "warning", "error", "off"],
+        default="info",
+        help="控制台 Python 日志等级，默认 info；详细日志始终写入 --log-file"
+    )
+    parser.add_argument(
+        "--log-file",
+        default="logs/runtime.log",
+        help="DEBUG 级完整日志写入路径，默认 logs/runtime.log；传空字符串禁用"
+    )
+    parser.add_argument(
+        "--maa-log-level",
+        type=int,
+        choices=[0, 1, 2, 3, 4],
+        default=None,
+        help="MaaFramework C++ 日志等级：0=关闭 1=Error 2=Warning(默认) 3=Info 4=Debug；"
+             "写入 maa_option.json，下次启动生效"
+    )
+
     parser.add_argument(
         "-D", "--device", default=None, metavar="名称",
         help="指定设备（覆盖环境变量 MDF_DEVICE 和 devices.yaml 的 default）"
@@ -748,13 +802,51 @@ def build_parser() -> argparse.ArgumentParser:
 
     return parser
 
+def _apply_maa_log_level(level: int):
+    """
+    覆盖 Maa C++ 日志等级：
+      1. 写入 maa_option.json（下次启动生效）
+      2. 尝试运行时设置（如 Maa API 支持）
+    """
+    import json
+    from core.config import MAA_OPTION_FILE
+
+    try:
+        option = {}
+        if MAA_OPTION_FILE.is_file():
+            with open(MAA_OPTION_FILE, "r", encoding="utf-8") as f:
+                option = json.load(f)
+        option["stdout_level"] = level
+        with open(MAA_OPTION_FILE, "w", encoding="utf-8") as f:
+            json.dump(option, f, ensure_ascii=False, indent=2)
+        logger.info(f"[maa-log-level] 已写入 maa_option.json: stdout_level={level}")
+    except Exception as e:
+        print(f"[maa-log-level] 写入 maa_option.json 失败: {e}")
+
+    # 环境变量兜底：让 config._init_maa_option 读到（如果还没初始化）
+    os.environ["MAA_STDOUT_LEVEL"] = str(level)
+
+    # 尝试运行时设置
+    try:
+        from maa.tasker import Tasker
+        if hasattr(Tasker, "set_stdout_level"):
+            Tasker.set_stdout_level(level)
+            logger.info(f"[maa-log-level] 运行时已设置: {level}")
+    except Exception:
+        pass
 
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    setup_logging(args.verbose)
 
-    # ★ 全局 -D 通过环境变量传递给 get_runner（最简方案）
+    # Python 日志：-v 优先于 --log-level
+    python_level = "debug" if args.verbose > 0 else args.log_level
+    setup_logging(python_level, args.log_file or None)
+
+    # Maa C++ 日志覆盖（写入 maa_option.json + 环境变量 + 运行时尝试）
+    if args.maa_log_level is not None:
+        _apply_maa_log_level(args.maa_log_level)
+
     if args.device:
         os.environ["MDF_DEVICE"] = args.device
 
