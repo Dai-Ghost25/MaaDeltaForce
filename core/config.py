@@ -22,39 +22,54 @@ DEVICES_FILE    = CONFIG_DIR / "devices.yaml"
 TRADE_FILE      = CONFIG_DIR / "trade_config.yaml"
 SCHEDULES_FILE  = CONFIG_DIR / "schedules.yaml"
 MAA_OPTION_FILE = CONFIG_DIR / "maa_option.json"
+COORDS_DIR = CONFIG_DIR / "coords"
+
 
 # 目录创建
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+COORDS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ---------- MaaFramework 全局初始化 ----------
 
 def _init_maa_option():
     """
-    初始化 Maa 的全局选项：
+    初始化 Maa 全局选项：
       1. 保证 config/maa_option.json 存在
       2. 把工作目录设成 PROJECT_ROOT
       3. 让 debug/ 生成在 PROJECT_ROOT/debug
+    环境变量 MAA_STDOUT_LEVEL 可覆盖默认 stdout_level
     """
     import json
+    import os
 
-    # 首次运行时创建默认选项
+    default_stdout_level = int(os.environ.get("MAA_STDOUT_LEVEL", "2"))
+
     if not MAA_OPTION_FILE.is_file():
         default = {
             "logging": True,
             "save_draw": False,
             "save_on_error": True,
-            "stdout_level": 2,
+            "stdout_level": default_stdout_level,
         }
         with open(MAA_OPTION_FILE, "w", encoding="utf-8") as f:
             json.dump(default, f, ensure_ascii=False, indent=2)
+    elif "MAA_STDOUT_LEVEL" in os.environ:
+        # 环境变量指定时，强制覆盖已有配置
+        try:
+            with open(MAA_OPTION_FILE, "r", encoding="utf-8") as f:
+                option = json.load(f)
+            option["stdout_level"] = default_stdout_level
+            with open(MAA_OPTION_FILE, "w", encoding="utf-8") as f:
+                json.dump(option, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"[config] 覆盖 maa_option.json 失败: {e}")
 
     try:
         from maa.toolkit import Toolkit
         Toolkit.init_option(str(PROJECT_ROOT))
     except Exception as e:
-        # 初始化失败不阻断，只打印
         print(f"[config] Maa Toolkit.init_option 失败: {e}")
 
 
@@ -128,7 +143,7 @@ TASKS = {
             "读取全面战场战绩对局时间": {"label": "对局时间"},
             "读取全面战场战绩战斗时长": {"label": "战斗时长"},
             "曼德尔砖累计积分":         {"label": "曼德尔砖积分","strip_prefix":"累计积分："},
-            "曼德尔砖周上限":         {"label": "曼德尔砖积分","strip_prefix":"制共享"},
+            "曼德尔砖周上限": {"label": "曼德尔砖积分", "value": "已达周上限"},
         },
     },
     "测试":{
@@ -137,16 +152,7 @@ TASKS = {
         "entry": "1test3",
         "enabled": True,
         "notify": "report",
-        "watch_nodes": {
-            "识别进攻方图标":{"label":"攻防方","value":"进攻方"},
-            "识别防守方图标":{"label":"攻防方","value":"防守方"},
-            "读取全面战场战绩输赢":     {"label": "输赢"},
-            "读取全面战场战绩得分":     {"label": "得分"},
-            "读取全面战场战绩对局时间": {"label": "对局时间"},
-            "读取全面战场战绩战斗时长": {"label": "战斗时长"},
-            "曼德尔砖累计积分":         {"label": "曼德尔砖积分","strip_prefix":"累计积分："},
-            "曼德尔砖周上限":         {"label": "曼德尔砖积分","strip_prefix":"制共享"},
-        },
+        "watch_nodes": "",
     },
     "交易行": {
         "label": "交易行",
@@ -205,6 +211,7 @@ class Config:
         self.pipeline_dir = PIPELINE_DIR
         self.log_dir = LOG_DIR
         self.deps_bin_dir = DEPS_BIN_DIR
+        self.coords_dir = COORDS_DIR
 
         # 任务清单
         self.tasks = TASKS

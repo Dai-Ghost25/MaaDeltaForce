@@ -19,49 +19,87 @@ logger = logging.getLogger(__name__)
 # ---------- 事件监听：任务级 ----------
 
 class _TaskerSink(TaskerEventSink):
+    """任务级事件：Tasker.Task.Starting / Succeeded / Failed"""
+
     def __init__(self, runner):
         super().__init__()
         self.runner = runner
 
     def _on_raw_notification(self, handle, msg, details):
         r = self.runner
+
         if msg == "Tasker.Task.Starting":
             r._start_time = time.time()
             logger.info(f"[任务开始] {details.get('entry')}")
         elif msg == "Tasker.Task.Succeeded":
             r._finish(success=True)
+            logger.info(f"[任务完成] {details.get('entry')}")
         elif msg == "Tasker.Task.Failed":
             r._finish(success=False)
+            logger.warning(f"[任务失败] {details.get('entry')}")
 
 
 # ---------- 事件监听：节点级 ----------
 
 class _ContextSink(ContextEventSink):
+    """节点级事件：Node.Recognition.* / Node.Action.*"""
+
     def __init__(self, runner):
         super().__init__()
         self.runner = runner
-        # self._node_start = 0    # ← 新增
 
     def _on_raw_notification(self, handle, msg, details):
         r = self.runner
         if r._current is None:
             return
 
-        # now = time.time()
-        # node_name = details.get("name", "?")
-
-        # # 记录每个节点的开始和结束时间
-        # if msg.endswith(".Starting"):
-        #     self._node_start = now
-        #     logger.info(f"[节点开始] {node_name}")
-        # elif msg.endswith(".Succeeded") or msg.endswith(".Failed"):
-        #     elapsed = now - self._node_start if self._node_start else 0
-        #     logger.info(f"[节点结束] {node_name} 耗时 {elapsed:.2f}s ({msg})")
-
         if msg == "Node.Recognition.Succeeded":
+            self._log_reco(handle, details)
             self._handle_recognition(handle, details, r)
+        elif msg == "Node.Recognition.Failed":
+            logger.debug(f"[识别失败] {details.get('name', '?')}")
         elif msg == "Node.Action.Succeeded":
+            self._log_action(details, r)
             self._handle_action(details, r)
+
+    def _log_reco(self, handle, details):
+        node_name = details.get("name", "?")
+        reco_id = details.get("reco_id")
+        context = Context(handle)
+        reco = context.tasker.get_recognition_detail(reco_id)
+        if not reco or not reco.hit:
+            return
+
+        box = getattr(reco, "box", None)
+        if box is None:
+            best = getattr(reco, "best_result", None)
+            box = getattr(best, "box", None) if best else None
+
+        best = getattr(reco, "best_result", None)
+        text = getattr(best, "text", "") if best else ""
+        score = getattr(best, "score", None) if best else None
+        algo = getattr(reco, "algorithm", None)
+
+        if box:
+            cx, cy = box[0] + box[2] // 2, box[1] + box[3] // 2
+            logger.debug(
+                f"[识别] {node_name}: algo={algo} text={text!r} "
+                f"box={list(box)} center=({cx},{cy}) score={score}"
+            )
+        else:
+            logger.debug(f"[识别] {node_name}: algo={algo} text={text!r} box=None score={score}")
+
+    def _log_action(self, details, r):
+        node_name = details.get("name", "?")
+        action_details = details.get("action_details") or {}
+        detail = action_details.get("detail") or {}
+        point = detail.get("point") if isinstance(detail, dict) else None
+        box = action_details.get("box")
+
+        if point:
+            logger.debug(f"[动作] {node_name}: point={point} box={box}")
+        else:
+            logger.debug(f"[动作] {node_name}: action={action_details.get('action')} box={box}")
 
     def _handle_recognition(self, handle, details, r):
         node_name = details.get("name")
@@ -78,16 +116,13 @@ class _ContextSink(ContextEventSink):
         if not text:
             return
 
-        # 记录"这个节点有识别结果"，供动作事件判断
         r._reco_captured_nodes.add(node_name)
-
         r._captured.append({
             "node": node_name,
             "text": text,
             "time": time.time(),
             "kind": "reco",
         })
-        logger.info(f"[捕获-识别] {node_name}: {text}")
 
         if r._stop_checker is not None:
             try:
@@ -101,7 +136,6 @@ class _ContextSink(ContextEventSink):
         if not self._should_capture(node_name, r):
             return
 
-        # 这个节点已经有识别捕获，跳过动作捕获，避免重复
         if node_name in r._reco_captured_nodes:
             return
 
@@ -111,11 +145,10 @@ class _ContextSink(ContextEventSink):
             "time": time.time(),
             "kind": "action",
         })
-        logger.info(f"[捕获-动作] {node_name}")
 
     @staticmethod
     def _should_capture(node_name, r):
-        watch = r._current.get("watch_nodes")
+        watch = r._current.get("watch_nodes") if r._current else None
         if not watch:
             return True
         keys = watch.keys() if isinstance(watch, dict) else watch
@@ -123,12 +156,12 @@ class _ContextSink(ContextEventSink):
 
     @staticmethod
     def _extract_text(reco) -> str:
-        best = reco.best_result
+        best = getattr(reco, "best_result", None)
         if best is None:
             return ""
         text = getattr(best, "text", None)
         return str(text) if text else ""
-    
+
 # ---------- TaskRunner ----------
 
 class TaskRunner:
@@ -153,6 +186,7 @@ class TaskRunner:
         self._init_controller()
         self._init_resource()
         self._init_tasker()
+        self._init_coords()
 
     # ---- 初始化 ----
 
@@ -186,6 +220,41 @@ class TaskRunner:
         self.tasker.add_sink(_TaskerSink(self))
         self.tasker.add_context_sink(_ContextSink(self))
 
+    def _init_coords(self):
+        from core.coords import get_coord_store
+        from core.template_resizer import resize_templates
+
+        self._coord_store = get_coord_store(self.device_name)
+        # 计算模板缩放比
+        TEMPLATE_NATIVE_W = 1152   # 现有模板都是从 S9 的 1152 空间裁的
+        gx_b, gy_b, gw_b, gh_b = self._coord_store._game_rect_in_base()
+        img_w = round(gw_b)
+        scale = img_w / TEMPLATE_NATIVE_W
+
+        if abs(scale - 1.0) < 0.01:
+            logger.info(f"[templates] scale={scale:.4f}，使用原模板")
+        else:
+            src_dir = self.cfg.resource_dir / "image"
+            dst_dir = self.cfg.project_root / "debug" / "templates" / f"{self.device_name}_w{img_w}"
+            self._coord_store.template_map = resize_templates(src_dir, dst_dir, scale)
+
+        self._coord_override = self._coord_store.build_override(self.cfg.pipeline_dir)
+        logger.info(
+            f"坐标 override 构建完成: {len(self._coord_override)} 个节点 "
+            f"(profile={self._coord_store.profile.name}, img_w={img_w}, "
+            f"templates={len(self._coord_store.template_map)})"
+        )
+    # ----  坐标边距计算 ----
+
+    def _merge_override(self, user_override: dict | None) -> dict:
+        merged: dict[str, dict] = {}
+        for node, fields in self._coord_override.items():
+            merged[node] = dict(fields)
+        if user_override:
+            for node, fields in user_override.items():
+                merged.setdefault(node, {}).update(fields)
+        return merged
+
     # ---- 任务回调（由 sink 触发） ----
 
     def _finish(self, success: bool):
@@ -200,10 +269,6 @@ class TaskRunner:
         pipeline_override=None,
         notify: str | None = None,
     ) -> bool:
-        """
-        notify: 覆盖任务自身的通知设置（none / simple / report）。
-                None = 用 core.config.TASKS 里配置的 notify。
-        """
         task = self.cfg.get_task(task_name)
         entry = task["entry"]
         if notify is None:
@@ -218,17 +283,20 @@ class TaskRunner:
         self._reco_captured_nodes = set()
 
         logger.info(f"===== 执行任务: {task_name} (entry={entry}) =====")
-        job = self.tasker.post_task(entry, pipeline_override=pipeline_override)
+        merged = self._merge_override(pipeline_override)
+        job = self.tasker.post_task(entry, pipeline_override=merged)
         job.wait()
-        # 如果你之前是 post_task(entry).wait()，现在改成拿 job 引用，
-        # 后面想硬停止时可以用 job.cancel()（如果框架支持）
-        # 不想改的话，保持原样也行
 
         elapsed = time.time() - self._start_time
-        success = (self._result == "success")
+
+        # 优先用 job.succeeded，不依赖 sink 事件
+        success = bool(job.succeeded)
+        if not success and self._result == "success":
+            # 兜底：如果 job 说失败但 sink 说成功，以 job 为准
+            logger.warning(f"[任务] job.succeeded=False 但 _result=success，以 job 为准")
+
         logger.info(f"===== 任务结束: {task_name} 成功={success} 耗时={elapsed:.2f}s =====")
 
-        # 通知部分不变
         if notify == "simple":
             self._notify_simple(task, success, elapsed)
         elif notify == "report":
@@ -253,7 +321,8 @@ class TaskRunner:
 
         t0 = time.time()
 
-        job = self.tasker.post_task(entry, pipeline_override=pipeline_override)
+        merged = self._merge_override(pipeline_override)
+        job = self.tasker.post_task(entry, pipeline_override=merged)
         job.wait()
 
         elapsed = time.time() - t0

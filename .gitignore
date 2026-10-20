@@ -34,3 +34,6 @@ secrets.json
 
 # debug
 debug/
+
+# tools测试工具
+tools/

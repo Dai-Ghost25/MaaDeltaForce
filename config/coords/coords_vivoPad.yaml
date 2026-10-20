@@ -1,0 +1,6 @@
+profile: pad_3_2
+resolution: [2400, 1600]
+game_rect: [0, 0, 2400, 1600]   # 游戏画面铺满整屏
+margin:
+  left: 0
+  right: 0
