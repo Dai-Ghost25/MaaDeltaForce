@@ -1,7 +1,6 @@
 # core/task_runner.py
 import time
 import logging
-from datetime import datetime
 
 from maa.tasker import Tasker, TaskerEventSink
 from maa.context import Context, ContextEventSink
@@ -27,7 +26,6 @@ class _TaskerSink(TaskerEventSink):
 
     def _on_raw_notification(self, handle, msg, details):
         r = self.runner
-
         if msg == "Tasker.Task.Starting":
             r._start_time = time.time()
             logger.info(f"[任务开始] {details.get('entry')}")
@@ -63,6 +61,7 @@ class _ContextSink(ContextEventSink):
             self._handle_action(details, r)
 
     def _log_reco(self, handle, details):
+        """调试日志：不受 watch_nodes 过滤，始终输出"""
         node_name = details.get("name", "?")
         reco_id = details.get("reco_id")
         context = Context(handle)
@@ -70,12 +69,11 @@ class _ContextSink(ContextEventSink):
         if not reco or not reco.hit:
             return
 
-        box = getattr(reco, "box", None)
-        if box is None:
-            best = getattr(reco, "best_result", None)
-            box = getattr(best, "box", None) if best else None
-
         best = getattr(reco, "best_result", None)
+        box = getattr(reco, "box", None)
+        if box is None and best is not None:
+            box = getattr(best, "box", None)
+
         text = getattr(best, "text", "") if best else ""
         score = getattr(best, "score", None) if best else None
         algo = getattr(reco, "algorithm", None)
@@ -90,6 +88,7 @@ class _ContextSink(ContextEventSink):
             logger.debug(f"[识别] {node_name}: algo={algo} text={text!r} box=None score={score}")
 
     def _log_action(self, details, r):
+        """调试日志：不受 watch_nodes 过滤"""
         node_name = details.get("name", "?")
         action_details = details.get("action_details") or {}
         detail = action_details.get("detail") or {}
@@ -102,6 +101,7 @@ class _ContextSink(ContextEventSink):
             logger.debug(f"[动作] {node_name}: action={action_details.get('action')} box={box}")
 
     def _handle_recognition(self, handle, details, r):
+        """捕获识别结果：受 watch_nodes 过滤"""
         node_name = details.get("name")
         if not self._should_capture(node_name, r):
             return
@@ -127,15 +127,17 @@ class _ContextSink(ContextEventSink):
         if r._stop_checker is not None:
             try:
                 if r._stop_checker(node_name, text):
+                    # 注意：_should_stop 当前仅作为状态标记，
+                    # job.wait() 阻塞期间不会检查它。预留未来做"中途打断"。
                     r._should_stop = True
             except Exception as e:
                 logger.warning(f"stop_checker 异常: {e}")
 
     def _handle_action(self, details, r):
+        """捕获动作结果：受 watch_nodes 过滤。识别节点已捕获则跳过，避免重复"""
         node_name = details.get("name")
         if not self._should_capture(node_name, r):
             return
-
         if node_name in r._reco_captured_nodes:
             return
 
@@ -161,6 +163,7 @@ class _ContextSink(ContextEventSink):
             return ""
         text = getattr(best, "text", None)
         return str(text) if text else ""
+
 
 # ---------- TaskRunner ----------
 
@@ -191,21 +194,19 @@ class TaskRunner:
     # ---- 初始化 ----
 
     def _init_controller(self):
-            adb = self.cfg.adb_path or "adb"
-            addr = self.device["adb_address"]
-            logger.info(f"连接设备 [{self.device_name}] {addr} (adb={adb})")
-            self.controller = AdbController(
-                adb_path=adb,
-                address=addr,
-                screencap_methods=4 | 2 | 1,
-            )
-            job = self.controller.post_connection().wait()
-            if not job.succeeded:
-                raise RuntimeError(
-                    f"ADB 连接失败: [{self.device_name}] {addr}"
-                )
-            self.controller.set_screenshot_target_short_side(720)
-            logger.info(f"设备 [{self.device_name}] 连接成功")
+        adb = self.cfg.adb_path or "adb"
+        addr = self.device["adb_address"]
+        logger.info(f"连接设备 [{self.device_name}] {addr} (adb={adb})")
+        self.controller = AdbController(
+            adb_path=adb,
+            address=addr,
+            screencap_methods=4 | 2 | 1,
+        )
+        job = self.controller.post_connection().wait()
+        if not job.succeeded:
+            raise RuntimeError(f"ADB 连接失败: [{self.device_name}] {addr}")
+        self.controller.set_screenshot_target_short_side(720)
+        logger.info(f"设备 [{self.device_name}] 连接成功")
 
     def _init_resource(self):
         self.resource = Resource()
@@ -225,8 +226,8 @@ class TaskRunner:
         from core.template_resizer import resize_templates
 
         self._coord_store = get_coord_store(self.device_name)
-        # 计算模板缩放比
-        TEMPLATE_NATIVE_W = 1152   # 现有模板都是从 S9 的 1152 空间裁的
+
+        TEMPLATE_NATIVE_W = 1152   # 现有模板都从 S9 的 1152 空间裁的
         gx_b, gy_b, gw_b, gh_b = self._coord_store._game_rect_in_base()
         img_w = round(gw_b)
         scale = img_w / TEMPLATE_NATIVE_W
@@ -244,7 +245,6 @@ class TaskRunner:
             f"(profile={self._coord_store.profile.name}, img_w={img_w}, "
             f"templates={len(self._coord_store.template_map)})"
         )
-    # ----  坐标边距计算 ----
 
     def _merge_override(self, user_override: dict | None) -> dict:
         merged: dict[str, dict] = {}
@@ -255,7 +255,7 @@ class TaskRunner:
                 merged.setdefault(node, {}).update(fields)
         return merged
 
-    # ---- 任务回调（由 sink 触发） ----
+    # ---- 任务回调 ----
 
     def _finish(self, success: bool):
         self._result = "success" if success else "failed"
@@ -292,25 +292,21 @@ class TaskRunner:
         # 优先用 job.succeeded，不依赖 sink 事件
         success = bool(job.succeeded)
         if not success and self._result == "success":
-            # 兜底：如果 job 说失败但 sink 说成功，以 job 为准
             logger.warning(f"[任务] job.succeeded=False 但 _result=success，以 job 为准")
 
         logger.info(f"===== 任务结束: {task_name} 成功={success} 耗时={elapsed:.2f}s =====")
 
-        if notify == "simple":
-            self._notify_simple(task, success, elapsed)
-        elif notify == "report":
-            self._notify_report(task, success, elapsed)
+        # simple 和 report 当前行为相同（都用 formatter.simple）；
+        # 未来若 report 改用 formatter.report（字段列表），在此分流。
+        if notify in ("simple", "report"):
+            self._notify(task, success, elapsed)
 
         self._current = None
         self._stop_checker = None
         return success
 
     def run_raw(self, entry: str, pipeline_override=None, watch_nodes=None):
-        """
-        直接跑一个 Pipeline 入口，不查 config.TASKS。
-        用于测试、临时任务。
-        """
+        """直接跑一个 Pipeline 入口，不查 config.TASKS。用于测试、临时任务。"""
         self._current = {"watch_nodes": watch_nodes}
         self._captured = []
         self._result = None
@@ -320,11 +316,9 @@ class TaskRunner:
         self._reco_captured_nodes = set()
 
         t0 = time.time()
-
         merged = self._merge_override(pipeline_override)
         job = self.tasker.post_task(entry, pipeline_override=merged)
         job.wait()
-
         elapsed = time.time() - t0
         logger.info(f"[run_raw] {entry} 耗时 {elapsed:.2f}s")
 
@@ -333,51 +327,44 @@ class TaskRunner:
 
     # ---- 通知 ----
 
-    def _notify_simple(self, task, success, elapsed):
+    def _notify(self, task, success, elapsed):
+        """发送钉钉通知。elapsed 暂未使用，保留以便未来在通知里显示耗时。"""
         status = "成功" if success else "失败"
-        title = f"{task['label']} - {status}"
+        base_title = f"{task['label']} - {status}"
 
-        # 把捕获内容拼成正文，不再显示耗时
-        if self._captured:
-            # content = "\n".join(f"{r['node']}: {r['text']}" for r in self._captured)
-            content = self._format_captured()
-        else:
-            content = "（无捕获内容）"
+        # title 第二行：从 headline 字段提取关键摘要（手机通知栏可显示两行）
+        headline = self._format_headline()
+        title = f"{base_title}\n{headline}" if headline else base_title
 
-        self.notifier.send(title, formatter.simple(title, content))
+        content = self._format_captured() if self._captured else "（无捕获内容）"
+        # 正文标题用 base_title（不含 headline），通知栏摘要和正文标题分离
+        self.notifier.send(title, formatter.simple(base_title, content))
 
-    def _notify_report(self, task, success, elapsed):
-        status = "成功" if success else "失败"
-        title = f"{task['label']} - {status}"
-
-        if self._captured:
-            content = self._format_captured()
-            # content = "\n".join(f"{r['node']}: {r['text']}" for r in self._captured)
-        else:
-            content = "（无捕获内容）"
-
-        self.notifier.send(title, formatter.simple(title, content))
+    # ---- watch_nodes 解析与格式化 ----
 
     @staticmethod
     def _parse_watch_entry(entry):
         """
-        解析 watch_nodes 的单个条目，返回 (mode, label, strip_prefix)
-        - entry 为 None    → ("auto", None, None)
-        - entry 为字符串   → (entry, None, None)
-        - entry 为字典     → (mode, label, strip_prefix)
+        解析 watch_nodes 的单个条目，统一返回 (mode, label, strip_prefix, headline)。
+        - entry 为 None    → ("auto", None, None, False)
+        - entry 为字符串   → (entry, None, None, False)
+        - entry 为字典     → (mode, label, strip_prefix, headline)
         """
         if entry is None:
-            return "auto", None, None
+            return "auto", None, None, False
         if isinstance(entry, str):
-            return entry, None, None
+            return entry, None, None, False
         if isinstance(entry, dict):
-            mode = entry.get("mode", "text")
-            label = entry.get("label")
-            strip = entry.get("strip_prefix")
-            return mode, label, strip
-        return "auto", None, None
+            return (
+                entry.get("mode", "text"),
+                entry.get("label"),
+                entry.get("strip_prefix"),
+                bool(entry.get("headline", False)),
+            )
+        return "auto", None, None, False
 
     def _format_captured(self) -> str:
+        """生成正文内容：所有 watch_nodes 命中的条目，Markdown 列表格式。"""
         if not self._captured:
             return "（无捕获内容）"
 
@@ -387,9 +374,8 @@ class TaskRunner:
         for r in self._captured:
             node, text = r["node"], r["text"]
             entry = watch.get(node) if isinstance(watch, dict) else None
-            mode, label, strip = self._parse_watch_entry(entry)
+            mode, label, strip, _headline = self._parse_watch_entry(entry)
 
-            # 优先用配置的固定值，否则用识别文本
             if isinstance(entry, dict) and "value" in entry:
                 display_text = entry["value"]
             else:
@@ -412,6 +398,39 @@ class TaskRunner:
                     lines.append(f"- **{node}**: {display_text}")
 
         return "\n".join(lines)
+
+    def _format_headline(self) -> str:
+        """生成 title 第二行：从 headline=True 的条目提取摘要。
+
+        多条 headline 用 " ｜ " 拼接（单行显示，适配通知栏两行限制）。
+        如需每条各占一行，改成 "\\n".join(lines) 即可。
+        """
+        if not self._captured:
+            return ""
+
+        watch = self._current.get("watch_nodes") if self._current else None
+        if not isinstance(watch, dict):
+            return ""
+
+        lines = []
+        for r in self._captured:
+            node = r["node"]
+            entry = watch.get(node)
+            if not isinstance(entry, dict) or not entry.get("headline"):
+                continue
+
+            if "value" in entry:
+                display_text = entry["value"]
+            else:
+                display_text = r["text"]
+                strip = entry.get("strip_prefix")
+                if strip and display_text.startswith(strip):
+                    display_text = display_text[len(strip):].strip()
+
+            label = entry.get("label", node)
+            lines.append(f"{label}：{display_text}")
+
+        return " ｜ ".join(lines)
 
     # ---- 生命周期 ----
 

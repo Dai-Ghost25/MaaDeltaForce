@@ -142,8 +142,21 @@ TASKS = {
             "读取全面战场战绩得分":     {"label": "得分"},
             "读取全面战场战绩对局时间": {"label": "对局时间"},
             "读取全面战场战绩战斗时长": {"label": "战斗时长"},
-            "曼德尔砖累计积分":         {"label": "曼德尔砖积分","strip_prefix":"累计积分："},
-            "曼德尔砖周上限": {"label": "曼德尔砖积分", "value": "已达周上限"},
+            "曼德尔砖累计积分":{
+                "label": "曼德尔砖积分",
+                "strip_prefix":"累计积分：",
+                "headline": True    #会在标题第二行显示
+                },
+            "曼德尔砖周上限": {
+                "label": "曼德尔砖积分",
+                "value": "已达周上限",
+                "headline": True
+                },
+            "其他设备登录": {
+                "label": "账号异常", 
+                "value": "其他设备登录",
+                "headline": True
+                }
         },
     },
     "测试":{
@@ -152,7 +165,20 @@ TASKS = {
         "entry": "1test3",
         "enabled": True,
         "notify": "report",
-        "watch_nodes": "",
+        "watch_nodes": {
+            "曼德尔砖累计积分": {
+                "label": "曼德尔砖",
+                "strip_prefix": "累计积分：",
+                "headline": True,          # ← 上标题
+            },
+            "曼德尔砖周上限": {
+                "label": "曼德尔砖",
+                "value": "已达周上限",
+                "headline": True,          # ← 上标题
+            },
+            "读取全面战场战绩输赢": {"label": "输赢"},   # 不上标题
+            "读取全面战场战绩得分": {"label": "得分"},
+        },
     },
     "交易行": {
         "label": "交易行",

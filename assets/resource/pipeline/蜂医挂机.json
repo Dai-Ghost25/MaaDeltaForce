@@ -69,8 +69,8 @@
             }
         ],
         "action": "Click",
-        "post_delay": 20000,
-        "timeout": 20000,
+        "post_delay": 5000,
+        "timeout": 60000,
         "next": [
             "进入部署",
             "等待部署",
@@ -79,6 +79,9 @@
             "部署"
         ]
     },
+
+    //部署大法
+
     "进入部署": {
         "recognition": "OCR",
         "expected": "进入部署",
@@ -287,39 +290,6 @@
             "选择可用点部署5"
         ]
     },
-    "部署6": {
-        "recognition": "OCR",
-        "expected": "部署",
-        "action": "Click",
-        "roi": [
-            1091,
-            644,
-            71,
-            26
-        ],
-        "post_delay": 3000,
-        "next": [
-            "识别烟幕为游戏中",
-            "直接点击C1"
-        ]
-    },
-    "部署7": {
-        "recognition": "OCR",
-        "expected": "部署",
-        "action": "Click",
-        "roi": [
-            1091,
-            644,
-            71,
-            26
-        ],
-        "post_delay": 3000,
-        "next": [
-            "识别烟幕为游戏中",
-            "哈夫克绿",
-            "GTI绿"
-        ]
-    },
     "选择可用点部署": {
         "action": "MultiSwipe",
         "swipes": [
@@ -355,7 +325,7 @@
         "swipes": [
             {
                 "begin": [
-                    250,
+                    150,
                     495
                 ],
                 "end": [
@@ -365,7 +335,7 @@
             },
             {
                 "begin": [
-                    900,
+                    1100,
                     225
                 ],
                 "end": [
@@ -384,7 +354,7 @@
         "swipes": [
             {
                 "begin": [
-                    250,
+                    150,
                     495
                 ],
                 "end": [
@@ -394,7 +364,7 @@
             },
             {
                 "begin": [
-                    900,
+                    1100,
                     225
                 ],
                 "end": [
@@ -413,7 +383,7 @@
         "swipes": [
             {
                 "begin": [
-                    250,
+                    150,
                     495
                 ],
                 "end": [
@@ -423,7 +393,7 @@
             },
             {
                 "begin": [
-                    900,
+                    1100,
                     225
                 ],
                 "end": [
@@ -442,7 +412,7 @@
         "swipes": [
             {
                 "begin": [
-                    250,
+                    150,
                     495
                 ],
                 "end": [
@@ -452,7 +422,7 @@
             },
             {
                 "begin": [
-                    900,
+                    1100,
                     225
                 ],
                 "end": [
@@ -471,7 +441,7 @@
         "swipes": [
             {
                 "begin": [
-                    250,
+                    150,
                     495
                 ],
                 "end": [
@@ -481,7 +451,7 @@
             },
             {
                 "begin": [
-                    900,
+                    1100,
                     225
                 ],
                 "end": [
@@ -494,6 +464,9 @@
             "识别烟幕为游戏中",
             "哈夫克绿",
             "GTI绿"
+        ],
+        "on_error":[
+            "冷静期"
         ]
     },
     "B1B2C1C2": {
@@ -542,6 +515,9 @@
         "next": [
             "部署2",
             "识别烟幕为游戏中"
+        ],
+        "on_error":[
+            "冷静期"
         ]
     },
     "直接点击B2": {
@@ -555,6 +531,9 @@
         "next": [
             "部署3",
             "识别烟幕为游戏中"
+        ],
+        "on_error":[
+            "冷静期"
         ]
     },
     "直接点击C1": {
@@ -568,6 +547,9 @@
         "next": [
             "部署4",
             "识别烟幕为游戏中"
+        ],
+        "on_error":[
+            "冷静期"
         ]
     },
     "直接点击C2": {
@@ -581,6 +563,39 @@
         "next": [
             "部署5",
             "识别烟幕为游戏中"
+        ],
+        "on_error":[
+            "冷静期"
+        ]
+    },
+    "哈夫克绿": {
+        "recognition": "TemplateMatch",
+        "template": "哈夫克绿.jpg",
+        "roi": [
+            500,
+            50,
+            444,
+            400
+        ],
+        "threshold": 0.5,
+        "action": "Click",
+        "next": [
+            "部署"
+        ]
+    },
+    "GTI绿": {
+        "recognition": "TemplateMatch",
+        "template": "GTI绿.jpg",
+        "roi": [
+            200,
+            100,
+            550,
+            350
+        ],
+        "threshold": 0.5,
+        "action": "Click",
+        "next": [
+            "部署"
         ]
     },
     "部署已就绪": {
@@ -597,113 +612,9 @@
             "复活后蹲下"
         ]
     },
-    "复活后蹲下": {
-        "action": "Click",
-        "target": [1064,659,20,20],
-        "post_delay": 0,
-        "next": [
-            "视角向下并打药"
-        ]
-    },
-    "A点": {
-        "recognition": "TemplateMatch",
-        "template": "A点.jpg",
-        "roi": [
-            417,
-            270,
-            222,
-            200
-        ],
-        "threshold": 0.5,
-        "action": "Click"
-    },
-    "B2绿": {
-        "recognition": "TemplateMatch",
-        "template": "B2绿.png",
-        "roi": [
-            417,
-            270,
-            222,
-            200
-        ],
-        "threshold": 0.5,
-        "action": "Click",
-        "next": [
-            "部署"
-        ]
-    },
-    "战术道具2": {
-        "action": "Click",
-        "target": [872,643,20,20],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "扎针3"
-        ]
-    },
-    "战场道具": {
-        "action": "Click",
-        "target": [380,535,20,20],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "识别治疗为游戏中",
-            "冷静期"
-        ]
-    },
-    "视角向下并打药": {
-        "action": "Swipe",
-        "begin": [1221,245,20,20],
-        "end": [
-            667,
-            400,
-            22,
-            20
-        ],
-        "duration": 500,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "战场道具"
-        ]
-    },
-    "扎针1": {
-        "action": "LongPress",
-        "target": [
-            1161,
-            185,
-            22,
-            20
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "视角向下并打药"
-        ]
-    },
-    "扎针2": {
-        "action": "LongPress",
-        "target": [
-            1161,
-            185,
-            22,
-            20
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "战术道具2"
-        ]
-    },
-    "扎针3": {
-        "action": "LongPress",
-        "target": [1221,245,20,20],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "冷静期"
-        ]
-    },
+    
+    //冷静，退出、结束
+    
     "放弃救援": {
         "recognition": "OCR",
         "expected": "放弃",
@@ -722,60 +633,18 @@
             "冷静期"
         ]
     },
-    "重新连接": {
-        "recognition": "OCR",
-        "expected": "确认重连",
-        "roi": [
-            751,
-            467,
-            92,
-            25
-        ],
-        "action": "Click",
-        "post_delay": 8000,
-        "next": [
-            "冷静期"
-        ]
-    },
     "冷静期": {
         "next": [
             "重新连接",
+            "其他设备登录",
+            "确认",
+            "识别烟雾为游戏中", 
+            "识别烟幕为游戏中", 
             "放弃救援",
             "部署",
             "回到大厅",
             "点击空白跳过",
-            "识别军械库为主页",
-            "视角向下并打药"
-        ]
-    },
-    "哈夫克绿": {
-        "recognition": "TemplateMatch",
-        "template": "哈夫克绿.jpg",
-        "roi": [
-            667,
-            50,
-            444,
-            400
-        ],
-        "threshold": 0.5,
-        "action": "Click",
-        "next": [
-            "部署"
-        ]
-    },
-    "GTI绿": {
-        "recognition": "TemplateMatch",
-        "template": "GTI绿.jpg",
-        "roi": [
-            300,
-            200,
-            389,
-            250
-        ],
-        "threshold": 0.5,
-        "action": "Click",
-        "next": [
-            "部署"
+            "识别军械库为主页"
         ]
     },
     "回到大厅": {
@@ -822,90 +691,31 @@
             "点击头像查看全面战场战绩"
         ]
     },
-    "查看曼德尔砖": {
+    
+
+    // 挂机主进程，包括打药、放道具以及判断是否在部署中的状态
+
+    "识别烟雾为游戏中": {//适用于已经完成部署的识别
         "recognition": "OCR",
-        "expected": "50",
-        "roi": [876,677,49,19],
-        "action": "Click",
-        "post_delay": 300,
-        "next": [
-            "曼德尔砖累计积分",
-            "曼德尔砖周上限",
-            "查看曼德尔砖"
-        ]
-    },
-    "曼德尔砖周上限": {
-        "recognition": "OCR",
-        "expected": "周上限",
-        "roi":[116,520,100,53],
-        "post_delay": 500,
-        "next": [
-            "退出曼德尔砖分数页面"
-        ]
-    },
-    "曼德尔砖累计积分": {
-        "recognition": "OCR",
-        "expected": "累计积分：",
-        "roi": [114,407,144,27],
-        "timeout": 2000,
-        "post_delay": 500,
-        "next": [
-            "退出曼德尔砖分数页面"
-        ]
-    },
-    "退出曼德尔砖分数页面": {
-        "action": "Click",
-        "roi": [683,69,12,11],
-        "next": [
-            "识别军械库为主页"
-        ]
-    },
-    "点击游戏中设置": {
-        "recognition": "TemplateMatch",
-        "template": "游戏中设置.jpg",
-        "action": "Click",
-        "roi": [
-            1229,
-            18,
-            30,
-            33
+        "expected": "烟雾",
+        "roi": [862,692,43,24],
+        "action": "Swipe",
+        "begin": [1221,245,20,20],
+        "end": [
+            667,
+            400,
+            22,
+            20
         ],
-        "next": [
-            "重新部署"
-        ]
-    },
-    "重新部署": {
-        "recognition": "OCR",
-        "expected": "重新部署",
-        "roi": [
-            1124,
-            659,
-            83,
-            25
-        ],
-        "action": "Click",
-        "next": [
-            "部署"
-        ]
-    },
-    "识别治疗为游戏中": {
-        "recognition": "OCR",
-        "expected": "治疗",
-        "roi": [1206,294,43,24],
-        "action": "LongPress",
-        "target_offset": [
-            0,
-            -50,
-            0,
-            0
-        ],
-        "post_delay": 0,
+        "duration": 500,
         "pre_delay": 0,
+        "post_delay": 0,
         "next": [
-            "战术道具2"
+            "战场道具",
+            "冷静期"
         ]
     },
-    "识别烟幕为游戏中": {
+    "识别烟幕为游戏中": {//适用于部署后第一次的识别
         "recognition": "Or",
         "any_of": [
             {
@@ -922,13 +732,134 @@
             }
         ],
         "action": "Click",
-        "target": [1064,659,20,20],//蹲下
         "post_delay": 0,
         "pre_delay": 0,
+        "next": [
+            "复活后蹲下",
+            "冷静期"
+        ]
+    },
+    "复活后蹲下": {
+        "action": "Click",
+        "target": [1064,659,20,20],
+        "post_delay": 0,
         "next": [
             "视角向下并打药"
         ]
     },
+    "视角向下并打药": {
+        "action": "Swipe",
+        "begin": [1221,245,20,20],
+        "end": [
+            667,
+            400,
+            22,
+            20
+        ],
+        "duration": 500,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "战场道具"
+        ]
+    },
+    "战场道具": {
+        "action": "Click",
+        "target": [380,535,20,20],
+        "_anchor": "bottom",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "识别烟雾后扎针2",
+            "冷静期"
+        ]
+    },
+    "识别烟雾后扎针2": {
+        "recognition": "OCR",
+        "expected": "烟雾",
+        "roi": [862,692,43,24],
+        "action": "LongPress",
+        "target": [1221,245,20,20],
+        "post_delay": 0,
+        "pre_delay": 0,
+        "next": [
+            "战术道具2",
+            "冷静期"
+        ]
+    },
+    "战术道具2": {//小烟
+        "action": "Click",
+        "target": [872,643,20,20],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "识别烟雾后扎针3",
+            "冷静期"
+        ]
+    },
+    "识别烟雾后扎针3": {
+        "recognition": "OCR",
+        "expected": "烟雾",
+        "roi": [862,692,43,24],
+        "action": "LongPress",
+        "target": [1221,245,20,20],
+        "post_delay": 0,
+        "pre_delay": 0,
+        "next": [
+            "冷静期"
+        ]
+    },
+
+    //异常处理，提高任务的鲁棒性
+
+    "其他设备登录":{
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "expected": "返回登录",
+                "roi": [602,479,94,27],
+                "_anchor": "center"
+            },
+            {
+                "recognition": "OCR",
+                "expected": "其它设备登录",
+                "roi": [484,291,176,26],
+                "_anchor": "center"
+            }
+        ],
+        "box_index": 0,
+        "action": "Click",
+        "post_delay": 2000,
+        "next":[
+            "StopApp"
+        ]
+    },
+    "重新连接": {
+        "recognition": "OCR",
+        "expected": "重新连接",
+        "roi": [753,477,93,32],
+        "action": "Click",
+        "post_delay": 8000,
+        "_anchor":"center",
+        "next": [
+            "冷静期"
+        ]
+    },
+    "确认":{//包括对局已结束、挂机警告
+        "recognition": "OCR",
+        "expected": "确认",
+        "roi": [623,478,51,32],
+        "action": "Click",
+        "post_delay": 8000,
+        "_anchor":"center",
+        "next": [
+            "冷静期"
+        ]
+    },
+
+    //结束后查看对局数据
+
     "点击头像查看全面战场战绩": {
         "action": "Click",
         "target": [
@@ -1065,5 +996,45 @@
         "next": [
             "查看曼德尔砖"
         ]
+    },
+    "查看曼德尔砖": {
+        "recognition": "OCR",
+        "expected": "50",
+        "roi": [876,677,49,19],
+        "action": "Click",
+        "post_delay": 300,
+        "next": [
+            "曼德尔砖累计积分",
+            "曼德尔砖周上限",
+            "查看曼德尔砖"
+        ]
+    },
+    "曼德尔砖累计积分": {
+        "recognition": "OCR",
+        "expected": "累计积分：",
+        "roi": [114,407,144,27],
+        "timeout": 2000,
+        "post_delay": 500,
+        "next": [
+            "退出曼德尔砖分数页面"
+        ]
+    },
+    "曼德尔砖周上限": {
+        "recognition": "OCR",
+        "expected": "周上限",
+        "roi":[116,520,100,53],
+        "post_delay": 500,
+        "next": [
+            "退出曼德尔砖分数页面"
+        ]
+    },
+    "退出曼德尔砖分数页面": {
+        "action": "Click",
+        "roi": [683,69,12,11],
+        "next": [
+            "识别军械库为主页"
+        ]
     }
+
+
 }
