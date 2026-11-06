@@ -37,3 +37,6 @@ debug/
 
 # tools测试工具
 tools/
+
+# MaaFramework，通过init或手动下载
+deps/
