@@ -47,6 +47,7 @@
     "选择蜂医": {
         "recognition": "TemplateMatch",
         "template": "蜂医.png",
+        "roi":[345, 515, 61, 61],
         "action": "Click",
         "post_delay": 2000,
         "timeout": 60000,
@@ -114,7 +115,7 @@
             },
             {
                 "recognition": "TemplateMatch",
-                "template": "A点.jpg",
+                "template": "A点.png",
                 "roi": [
                     417,
                     270,
@@ -150,7 +151,7 @@
             },
             {
                 "recognition": "TemplateMatch",
-                "template": "GTI绿.jpg",
+                "template": "GTI绿.png",
                 "roi": [
                     56,
                     50,
@@ -281,24 +282,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    250,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    900,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -311,24 +318,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    150,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    1100,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -340,24 +353,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    150,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    1100,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -369,24 +388,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    150,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    1100,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -398,24 +423,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    150,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    1100,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -427,24 +458,30 @@
         "action": "MultiSwipe",
         "swipes": [
             {
-                "begin": [
-                    150,
-                    495
-                ],
-                "end": [
-                    250,
-                    495
-                ]
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
             },
             {
-                "begin": [
-                    1100,
-                    225
-                ],
-                "end": [
-                    50,
-                    450
-                ]
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
+            },
+            {
+                "starting": 600,
+                "begin": [50, 450],
+                "end": [900, 225],
+                "duration": 200,
+                "contact": 0
+            },
+            {
+                "starting": 600,
+                "begin": [900, 225],
+                "end": [50, 450],
+                "duration": 200,
+                "contact": 1
             }
         ],
         "next": [
@@ -557,7 +594,7 @@
     },
     "哈夫克绿": {
         "recognition": "TemplateMatch",
-        "template": "哈夫克绿.jpg",
+        "template": "哈夫克绿.png",
         "roi": [
             500,
             50,
@@ -572,7 +609,7 @@
     },
     "GTI绿": {
         "recognition": "TemplateMatch",
-        "template": "GTI绿.jpg",
+        "template": "GTI绿.png",
         "roi": [
             200,
             100,

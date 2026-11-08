@@ -227,7 +227,7 @@ class TaskRunner:
 
         self._coord_store = get_coord_store(self.device_name)
 
-        TEMPLATE_NATIVE_W = 1152   # 现有模板都从 S9 的 1152 空间裁的
+        TEMPLATE_NATIVE_W = 1280   # 模板长边
         gx_b, gy_b, gw_b, gh_b = self._coord_store._game_rect_in_base()
         img_w = round(gw_b)
         scale = img_w / TEMPLATE_NATIVE_W
@@ -239,12 +239,18 @@ class TaskRunner:
             dst_dir = self.cfg.project_root / "debug" / "templates" / f"{self.device_name}_w{img_w}"
             self._coord_store.template_map = resize_templates(src_dir, dst_dir, scale)
 
+        # logger.info("[templates] 已禁用模板缩放，使用原图")
+
         self._coord_override = self._coord_store.build_override(self.cfg.pipeline_dir)
         logger.info(
             f"坐标 override 构建完成: {len(self._coord_override)} 个节点 "
             f"(profile={self._coord_store.profile.name}, img_w={img_w}, "
             f"templates={len(self._coord_store.template_map)})"
         )
+        # logger.info(
+        # f"坐标 override 构建完成: {len(self._coord_override)} 个节点 "
+        # f"(profile={self._coord_store.profile.name}, templates=原始)"
+        # )
 
     def _merge_override(self, user_override: dict | None) -> dict:
         merged: dict[str, dict] = {}
