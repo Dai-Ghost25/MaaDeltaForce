@@ -329,7 +329,7 @@ class TaskRunner:
 
     def _notify(self, task, success, elapsed):
         """发送钉钉通知。elapsed 暂未使用，保留以便未来在通知里显示耗时。"""
-        status = "成功" if success else "失败"
+        status = "成功" if success else "异常"
         base_title = f"{task['label']} - {status}"
 
         # title 第二行：从 headline 字段提取关键摘要（手机通知栏可显示两行）
