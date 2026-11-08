@@ -2,3 +2,4 @@ maafw
 apscheduler
 pyyaml
 requests
+Pillow
